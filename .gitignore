@@ -12,9 +12,6 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
-# Only for this repo!
-*.meta
-
 # Windows Installer files
 *.cab
 *.msi
