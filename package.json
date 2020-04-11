@@ -1,0 +1,18 @@
+  
+{
+    "name": "net.emergo-entertainment.unity-utilities",
+    "version": "0.1.0",
+    "displayName": "Emergo Entertainment's Unity Extensions",
+    "description": "Lorem ipsum...",
+    "unity": "2019.3",
+    "keywords": [],
+    "dependencies": {
+    },
+    "author": {
+      "name": "Emergo Entertainment",
+      "email": "studio@emergo-entertainment.de",
+      "url": "https://emergo-entertainment.de"
+    },
+    "type": "library",
+    "hideInEditor": false
+  }
