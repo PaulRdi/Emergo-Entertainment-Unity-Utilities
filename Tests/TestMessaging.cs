@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using EmergoEntertainment.Messaging;
 
-namespace EmergoEntertainment.UnityUtilities.Tests
+namespace EmergoEntertainment.Tests
 {
     public class TestMessaging
     {
