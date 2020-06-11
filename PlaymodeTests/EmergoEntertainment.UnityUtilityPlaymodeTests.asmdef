@@ -4,9 +4,11 @@
         "EmergoEntertainment",
         "EmergoEntertainment.Messaging",
         "EmergoEntertainment.Inventory",
-      "UnityEngine.TestRunner"
+        "UnityEngine.TestRunner"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
