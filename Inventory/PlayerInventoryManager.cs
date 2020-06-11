@@ -84,7 +84,6 @@ namespace EmergoEntertainment.Inventory
             btn.clicked += RecipeClicked;
             buttonToRecipe.Add(btn, r);
         }
-        //bug: items over multiple batches do not count to availability
         private void RecipeClicked(RecipeButton btn)
         {
             if (!buttonToRecipe.ContainsKey(btn))
@@ -94,7 +93,7 @@ namespace EmergoEntertainment.Inventory
             bool craftingAllowed = true;
             foreach (RecipeComponent c in toCraft.Components)
             {
-                if (playerInventory.GetResourceAmount(c.Item) < c.Amount)
+                if (playerInventory.GetTotalItemAmount(c.Item) < c.Amount)
                 {
                     craftingAllowed = false;
                     break;

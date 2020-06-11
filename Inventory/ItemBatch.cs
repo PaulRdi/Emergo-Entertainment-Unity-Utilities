@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace EmergoEntertainment.Inventory
 {
-    public class ItemBatch
+    public class ItemBatch 
     {
         public Item item {
             get
@@ -16,6 +20,8 @@ namespace EmergoEntertainment.Inventory
             }
         }
         public readonly List<IItemInstance> items;
+
+
         public int count
         {
             get => items.Count;
@@ -27,9 +33,12 @@ namespace EmergoEntertainment.Inventory
                 return count * item.stackWeight;
             }
         }
-        public void Add(int amount)
+        public void AddNew(int amount)
         {
-            items.Add(ItemManager.CreateItemInstance(item));
+            for (int i = 0; i < amount; i++)
+            {
+                items.Add(ItemManager.CreateItemInstance(item));
+            }
         }
         public bool TryAdd(IItemInstance itemInstance)
         {

@@ -9,6 +9,8 @@ namespace EmergoEntertainment.Inventory
     public class Inventory
     {
         public event Action Updated;
+        public event Action<IItemInstance> ItemsAdded;
+
 
         public Dictionary<Item, List<ItemBatch>> itemToItemBatch;
         public List<ItemBatch> itemBatches;
@@ -113,7 +115,7 @@ namespace EmergoEntertainment.Inventory
 
             if (queriedBatch != default(ItemBatch))
             {
-                queriedBatch.Add(1);
+                queriedBatch.AddNew(1);
             }
             else
             {
