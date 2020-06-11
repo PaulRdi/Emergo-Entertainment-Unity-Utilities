@@ -30,5 +30,7 @@ namespace Tests
                 "Did not initialize all property members of inventory in constructor.");
 
         }
+
+        
     }
 }

@@ -12,6 +12,7 @@ namespace EmergoEntertainment.Inventory
     {
         public List<Item> items;
         public static AllItems current;
+
     }
 }
 

@@ -22,5 +22,82 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             
         }
 
+        [UnityTest]
+        public IEnumerator TestBatchFull()
+        {
+            ItemManager itemManager = new ItemManager();
+            Inventory.Inventory inventory = new Inventory.Inventory(5, 2);
+            Item item1 = ScriptableObject.CreateInstance<Item>();
+            item1.name = "item1";
+
+            Item item2 = ScriptableObject.CreateInstance<Item>();
+            item2.name = "item2";
+
+
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.TryAddItem(item1));
+            yield return null;
+
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.TryAddItem(item1));
+
+            yield return null;
+
+            Assert.False(inventory.TryAddItem(item2));          
+
+        }
+
+        [UnityTest]
+        public IEnumerator TestTakeMultipleItems()
+        {
+            List<IItemInstance> items = new List<IItemInstance>();
+            ItemManager itemManager = new ItemManager();
+            Inventory.Inventory inventory = new Inventory.Inventory(5, 2);
+            Item item1 = ScriptableObject.CreateInstance<Item>();
+            item1.name = "item1";
+            Item item2 = ScriptableObject.CreateInstance<Item>();
+            item2.name = "item2";
+
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.TryAddItem(item2));
+            Assert.True(inventory.TryAddItem(item2));
+            yield return null;
+            Assert.False(inventory.TryTakeItems(item1, ref items, 2));
+            Assert.True(inventory.TryTakeItems(item1, ref items, 1));
+            Assert.False(inventory.TryTakeItems(item1, ref items, 1));
+            Assert.True(inventory.TryTakeItems(item2, ref items, 2));
+            Assert.AreEqual(3, items.Count);
+        }
+
+        [UnityTest]
+        public IEnumerator TestAddAndTakeItems()
+        {
+            List<IItemInstance> items = new List<IItemInstance>();
+            ItemManager itemManager = new ItemManager();
+            Inventory.Inventory inventory = new Inventory.Inventory(5, 2);
+            Item item1 = ScriptableObject.CreateInstance<Item>();
+            item1.name = "item1";
+            Item item2 = ScriptableObject.CreateInstance<Item>();
+            item2.name = "item2";
+            Item item3 = ScriptableObject.CreateInstance<Item>();
+            item3.name = "item3";
+
+            yield return null;
+
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.TryAddItem(item2));
+            Assert.True(inventory.TryAddItem(item2));
+
+            Assert.False(inventory.TryTakeItems(item3, ref items));
+            Assert.True(inventory.TryTakeItems(item1, ref items));
+            //try to add the same item instance twice
+            Assert.True(inventory.TryAddItemInstance(items[0]));
+            Assert.False(inventory.TryAddItemInstance(items[0]));
+            Assert.True(inventory.TryAddItem(item1));
+        }
+
     }
 }

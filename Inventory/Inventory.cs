@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using UnityEngine;
 namespace EmergoEntertainment.Inventory
 {
     public class Inventory
@@ -14,6 +14,7 @@ namespace EmergoEntertainment.Inventory
         public List<ItemBatch> itemBatches;
         public Dictionary<int, ItemBatch> slotToItemBatch;
         public int maxBatchSize { get; private set; }
+      
 
         public Inventory(int maxBatchSize, int numSlots)
         {
@@ -89,7 +90,7 @@ namespace EmergoEntertainment.Inventory
                 b.fillLevel <= maxBatchSize - b.item.stackWeight);
             if (queriedBatch != default(ItemBatch))
             {
-                queriedBatch.Add(itemInstance);
+                return queriedBatch.TryAdd(itemInstance);
             }
             else
             {
@@ -120,7 +121,7 @@ namespace EmergoEntertainment.Inventory
                 {
                     return false;
                 }
-                ItemBatch batch = new ItemBatch(item, 1);
+                ItemBatch batch = new ItemBatch(ItemManager.CreateItemInstance(item, null), 1);
                 itemBatches.Add(batch);
                 int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k] == null);
                 slotToItemBatch[freeInventorySlotID] = batch;
@@ -141,16 +142,35 @@ namespace EmergoEntertainment.Inventory
         }
 
 
-        public bool TryTakeItem(int slotID, out List<IItemInstance> items, int amount = 1)
+        bool TryTakeItemFromSlot(int slotID, ref List<IItemInstance> items)
         {
-            items = null;
             if (!slotToItemBatch.ContainsKey(slotID) ||
                 slotToItemBatch[slotID] == null)
                 return false;
             if (slotToItemBatch[slotID].count <= 0)
                 return false;
 
-            items = slotToItemBatch[slotID].Take(amount);
+            items = slotToItemBatch[slotID].Take(1);
+            return true;
+        }
+
+        public int GetTotalItemAmount (Item item)
+        {
+            return itemToItemBatch.Where(kvp => kvp.Key == item)
+                .Sum(kvp => kvp.Value
+                .Sum(batch => batch.count));
+        }
+
+        public bool TryTakeItems(Item item, ref List<IItemInstance> items, int amount = 1)
+        {
+            if (GetTotalItemAmount(item) < amount)
+                return false;
+
+            for (int i = 0; i < amount; i++)
+            {
+                ItemBatch batch = itemBatches.First(b => b.item == item);
+                items.Add(batch.Take(1)[0]);
+            }
             UpdateEmptyBatches();
             return true;
         }

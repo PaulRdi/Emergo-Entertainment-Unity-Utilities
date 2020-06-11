@@ -7,7 +7,14 @@ namespace EmergoEntertainment.Inventory
 {
     public class ItemBatch
     {
-        public readonly Item item;
+        public Item item {
+            get
+            {
+                if (items.Count > 0)
+                    return items[0].data;
+                return null;
+            }
+        }
         public readonly List<IItemInstance> items;
         public int count
         {
@@ -24,9 +31,14 @@ namespace EmergoEntertainment.Inventory
         {
             items.Add(ItemManager.CreateItemInstance(item));
         }
-        public void Add(IItemInstance itemInstance)
+        public bool TryAdd(IItemInstance itemInstance)
         {
+            if (item != itemInstance.data)
+                return false;
+            if (items.Any(i => i == itemInstance))
+                return false;
             items.Add(itemInstance);
+            return true;
         }
         public List<IItemInstance> Take(int amount)
         {
@@ -68,26 +80,21 @@ namespace EmergoEntertainment.Inventory
         public ItemBatch(IItemInstance instance)
         {
             this.items = new List<IItemInstance>();
-            this.item = instance.data;
             items.Add(instance);
         }
         public ItemBatch(List<IItemInstance> instances)
         {
             if (instances.Count == 0)
                 return;
-            this.item = instances[0].data;
             this.items = new List<IItemInstance>(instances);
         }
-        public ItemBatch(Item item, int count = 1)
+        public ItemBatch(IItemInstance item, int count = 1)
         {
             this.items = new List<IItemInstance>();
-            this.item = item;
 
             for (int i = 0; i < count; i++)
             {
-                IItemInstance instance = ItemManager.CreateItemInstance(item);
-                items.Add(instance);
-
+                items.Add(item);
             }
         }
     }
