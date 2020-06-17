@@ -21,12 +21,12 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] Recipe[] recipes;
         [SerializeField] GameObject recipeEntryPrefab;
         [SerializeField] Transform recipeListParent;
-        [SerializeField] GameObject inventoryPrefab;
+        [SerializeField] InventorySlotView inventorySlotPrefab;
         [SerializeField] Transform inventorySlotParent;
         [SerializeField] int inventorySize;
         [SerializeField] int maxBatchSize = 25;
         [SerializeField] bool useRecipes = false;
-
+        [SerializeField] bool initOnAwake = false;
 
         Dictionary<int, InventorySlotView> slotToUI;
         Dictionary<RecipeButton, Recipe> buttonToRecipe;
@@ -36,6 +36,12 @@ namespace EmergoEntertainment.Inventory
 
         public Inventory playerInventory;
         public GameObject trashObject;
+
+        public void Awake()
+        {
+            if (initOnAwake)
+                INIT();
+        }
 
         public void INIT()
         {
@@ -73,7 +79,13 @@ namespace EmergoEntertainment.Inventory
             {
                 InstantiateRecipe(r);
             }
+            currentID = 0;
 
+            for (int i= 0; i < inventorySize; i++)
+            {
+                InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
+                slotView.Init();
+            }
         }
 
         private void InstantiateRecipe(Recipe r)
@@ -126,12 +138,11 @@ namespace EmergoEntertainment.Inventory
 
         internal bool TryRegisterSlotView(InventorySlotView inventorySlot, out int id)
         {
-            id = -1;
+            id = currentID;
             if (playerInventory.slotToItemBatch.ContainsKey(currentID) &&
                 !slotToUI.ContainsKey(currentID))
             {
                 slotToUI.Add(currentID, inventorySlot);
-                id = currentID;
                 currentID++;
                 return true;
             }
