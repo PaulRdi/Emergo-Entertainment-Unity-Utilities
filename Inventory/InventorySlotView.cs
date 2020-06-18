@@ -6,21 +6,27 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 namespace EmergoEntertainment.Inventory
 {
-    [RequireComponent(typeof(Button))]
-    public class InventorySlotView : MonoBehaviour, IDragHandler, IDropHandler, IPointerUpHandler, IPointerDownHandler
+    public class InventorySlotView : MonoBehaviour, IPointerClickHandler, IDragHandler, IDropHandler, IPointerUpHandler, IPointerDownHandler
     {
         public static event Action<InventorySlotView> Clicked;
         //Reminder: We need some sort of hook.
         //public static event Action<InventorySlot, FiresidePlace> DraggedToCampsite;
         //public static event Action<InventorySlot, PlayerController> DraggedToPlayer;
         public static event Action<InventorySlotView> DraggedToTrash;
+        public static event Action<InventorySlotView, GameObject> DraggedToWorldSpaceObject;
         static GameObject dragObject;
-
+        Camera eventCamera;
         [SerializeField] TextMeshProUGUI stackSizeText;
         [SerializeField] Image image;
+
+        /// <summary>
+        /// Defines which layers are targeted to trigger the DraggedToObject event.
+        /// </summary>
+        [SerializeField] LayerMask dragMask;
 
         bool dragging;
 
@@ -40,7 +46,6 @@ namespace EmergoEntertainment.Inventory
             {
                 throw new System.Exception("Could not add UI representation of inventory slot.");
             }
-            GetComponent<Button>().onClick.AddListener(ButtonClicked);
             UpdateItemSlot(null);
             dragging = false;
 
@@ -87,8 +92,16 @@ namespace EmergoEntertainment.Inventory
                 return;
             }
             dragObject.transform.position = eventData.position;
+
         }
 
+        internal void SetEventCamera(Camera eventCamera)
+        {
+            if (eventCamera == null)
+                eventCamera = FindObjectOfType<Camera>();
+
+            this.eventCamera = eventCamera;
+        }
 
         public void OnPointerUp(PointerEventData eventData)
         {
@@ -99,8 +112,25 @@ namespace EmergoEntertainment.Inventory
 
             List<RaycastResult> res = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, res);
-            if (res.Any(r => r.gameObject == PlayerInventoryManager.instance.trashObject))
+            if (PlayerInventoryManager.instance.trashObject != null &&
+                res.Any(r => r.gameObject == PlayerInventoryManager.instance.trashObject.gameObject))
                 DraggedToTrash?.Invoke(this);
+
+
+
+            if (eventCamera != null &&                
+                Physics.Raycast(
+                eventCamera.ScreenPointToRay(Input.mousePosition), 
+                out RaycastHit hit, 
+                Mathf.Infinity, 
+                dragMask))
+            {
+                DraggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
+                foreach(IInventorySlotInteractable slotInteractable in hit.transform.gameObject.GetComponentsInChildren<IInventorySlotInteractable>())
+                {
+                    slotInteractable.InventorySlotDroppedOnObject(this);
+                }
+            }
 
             dragObject.SetActive(false);
             dragging = false;
@@ -119,6 +149,11 @@ namespace EmergoEntertainment.Inventory
 
         public void OnDrop(PointerEventData eventData)
         {
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            ButtonClicked();
         }
     }
 }

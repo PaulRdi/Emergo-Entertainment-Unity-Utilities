@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 namespace EmergoEntertainment.Inventory
 {
@@ -27,6 +29,7 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] int maxBatchSize = 25;
         [SerializeField] bool useRecipes = false;
         [SerializeField] bool initOnAwake = false;
+        public Camera eventCamera;
 
         Dictionary<int, InventorySlotView> slotToUI;
         Dictionary<RecipeButton, Recipe> buttonToRecipe;
@@ -35,7 +38,7 @@ namespace EmergoEntertainment.Inventory
         int currentID;
 
         public Inventory playerInventory;
-        public GameObject trashObject;
+        public RectTransform trashObject;
 
         public void Awake()
         {
@@ -73,7 +76,7 @@ namespace EmergoEntertainment.Inventory
             currentID = 0;
             InventorySlotView.Clicked += InventorySlot_Clicked;
             playerInventory = new Inventory(maxBatchSize, inventorySize);
-
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 
             foreach (Recipe r in recipes)
             {
@@ -85,6 +88,22 @@ namespace EmergoEntertainment.Inventory
             {
                 InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
                 slotView.Init();
+            }
+        }
+
+        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            PhysicsRaycaster raycaster = FindObjectOfType<PhysicsRaycaster>();
+            if (raycaster == null)
+                Debug.LogWarning("There was no physics raycaster in the scene you loaded. Inventory Pointer callbacks may not work as intended.");
+            else
+            {
+                eventCamera = raycaster.GetComponent<Camera>();
+                
+            }
+            foreach (InventorySlotView slotView in slotToUI.Values)
+            {
+                slotView.SetEventCamera(eventCamera);
             }
         }
 
