@@ -64,10 +64,10 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             Assert.True(inventory.TryAddItem(item2));
             Assert.True(inventory.TryAddItem(item2));
             yield return null;
-            Assert.False(inventory.TryTakeItems(item1, ref items, 2));
-            Assert.True(inventory.TryTakeItems(item1, ref items, 1));
-            Assert.False(inventory.TryTakeItems(item1, ref items, 1));
-            Assert.True(inventory.TryTakeItems(item2, ref items, 2));
+            Assert.False(inventory.TryTakeItems(item1, out items, 2));
+            Assert.True(inventory.TryTakeItems(item1, out items, 1));
+            Assert.False(inventory.TryTakeItems(item1, out items, 1));
+            Assert.True(inventory.TryTakeItems(item2, out items, 2));
             Assert.AreEqual(3, items.Count);
         }
 
@@ -91,8 +91,8 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             Assert.True(inventory.TryAddItem(item2));
             Assert.True(inventory.TryAddItem(item2));
 
-            Assert.False(inventory.TryTakeItems(item3, ref items));
-            Assert.True(inventory.TryTakeItems(item1, ref items));
+            Assert.False(inventory.TryTakeItems(item3, out items));
+            Assert.True(inventory.TryTakeItems(item1, out items));
             //try to add the same item instance twice
             Assert.True(inventory.TryAddItemInstance(items[0]));
             Assert.False(inventory.TryAddItemInstance(items[0]));

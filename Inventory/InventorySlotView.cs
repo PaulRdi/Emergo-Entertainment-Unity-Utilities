@@ -13,16 +13,12 @@ namespace EmergoEntertainment.Inventory
     public class InventorySlotView : MonoBehaviour, IPointerClickHandler, IDragHandler, IDropHandler, IPointerUpHandler, IPointerDownHandler
     {
         public static event Action<InventorySlotView> Clicked;
-        //Reminder: We need some sort of hook.
-        //public static event Action<InventorySlot, FiresidePlace> DraggedToCampsite;
-        //public static event Action<InventorySlot, PlayerController> DraggedToPlayer;
         public static event Action<InventorySlotView> DraggedToTrash;
         public static event Action<InventorySlotView, GameObject> DraggedToWorldSpaceObject;
         static GameObject dragObject;
         Camera eventCamera;
         [SerializeField] TextMeshProUGUI stackSizeText;
         [SerializeField] Image image;
-
         /// <summary>
         /// Defines which layers are targeted to trigger the DraggedToObject event.
         /// </summary>
@@ -108,7 +104,6 @@ namespace EmergoEntertainment.Inventory
             if (!dragging)
                 return;
             Ray ray = Camera.main.ScreenPointToRay(eventData.position);
-            //Todo: Make it so item can be dragged to a target
 
             List<RaycastResult> res = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, res);

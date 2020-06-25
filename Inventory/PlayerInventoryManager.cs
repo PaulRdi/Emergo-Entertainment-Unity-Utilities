@@ -77,7 +77,7 @@ namespace EmergoEntertainment.Inventory
             InventorySlotView.Clicked += InventorySlot_Clicked;
             playerInventory = new Inventory(maxBatchSize, inventorySize);
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
-
+            playerInventory.Updated += PlayerInventory_Updated;
             foreach (Recipe r in recipes)
             {
                 InstantiateRecipe(r);
@@ -89,6 +89,11 @@ namespace EmergoEntertainment.Inventory
                 InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
                 slotView.Init();
             }
+        }
+
+        private void PlayerInventory_Updated()
+        {
+            UpdateUI();
         }
 
         private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)

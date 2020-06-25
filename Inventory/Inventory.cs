@@ -144,8 +144,9 @@ namespace EmergoEntertainment.Inventory
         }
 
 
-        bool TryTakeItemFromSlot(int slotID, ref List<IItemInstance> items)
+       public bool TryTakeItemFromSlot(int slotID, out List<IItemInstance> items)
         {
+            items = null;
             if (!slotToItemBatch.ContainsKey(slotID) ||
                 slotToItemBatch[slotID] == null)
                 return false;
@@ -153,6 +154,7 @@ namespace EmergoEntertainment.Inventory
                 return false;
 
             items = slotToItemBatch[slotID].Take(1);
+            UpdateEmptyBatches();
             return true;
         }
 
@@ -163,8 +165,9 @@ namespace EmergoEntertainment.Inventory
                 .Sum(batch => batch.count));
         }
 
-        public bool TryTakeItems(Item item, ref List<IItemInstance> items, int amount = 1)
+        public bool TryTakeItems(Item item, out List<IItemInstance> items, int amount = 1)
         {
+            items = null;
             if (GetTotalItemAmount(item) < amount)
                 return false;
 
