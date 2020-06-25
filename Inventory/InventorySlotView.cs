@@ -112,18 +112,16 @@ namespace EmergoEntertainment.Inventory
                 DraggedToTrash?.Invoke(this);
 
 
-
-            if (eventCamera != null &&                
-                Physics.Raycast(
-                eventCamera.ScreenPointToRay(Input.mousePosition), 
-                out RaycastHit hit, 
-                Mathf.Infinity, 
-                dragMask))
+            if (eventCamera != null)
             {
-                DraggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
-                foreach(IInventorySlotInteractable slotInteractable in hit.transform.gameObject.GetComponentsInChildren<IInventorySlotInteractable>())
-                {
-                    slotInteractable.InventorySlotDroppedOnObject(this);
+                ray = eventCamera.ScreenPointToRay(Input.mousePosition);
+                foreach (RaycastHit hit in Physics.RaycastAll(ray, float.MaxValue, dragMask))                {
+
+                    DraggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
+                    foreach (IInventorySlotInteractable slotInteractable in hit.transform.gameObject.GetComponents<IInventorySlotInteractable>())
+                    {
+                        slotInteractable.InventorySlotDroppedOnObject(this);
+                    }
                 }
             }
 
