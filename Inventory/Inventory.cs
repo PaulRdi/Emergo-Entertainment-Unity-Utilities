@@ -11,12 +11,10 @@ namespace EmergoEntertainment.Inventory
         public event Action Updated;
         public event Action<IItemInstance> ItemsAdded;
 
-
         public Dictionary<Item, List<ItemBatch>> itemToItemBatch;
         public List<ItemBatch> itemBatches;
         public Dictionary<int, ItemBatch> slotToItemBatch;
-        public int maxBatchSize { get; private set; }
-      
+        public int maxBatchSize { get; private set; }      
 
         public Inventory(int maxBatchSize, int numSlots)
         {
@@ -146,7 +144,7 @@ namespace EmergoEntertainment.Inventory
 
        public bool TryTakeItemFromSlot(int slotID, out List<IItemInstance> items)
         {
-            items = null;
+            items = new List<IItemInstance>();
             if (!slotToItemBatch.ContainsKey(slotID) ||
                 slotToItemBatch[slotID] == null)
                 return false;
@@ -167,7 +165,8 @@ namespace EmergoEntertainment.Inventory
 
         public bool TryTakeItems(Item item, out List<IItemInstance> items, int amount = 1)
         {
-            items = null;
+            items = new List<IItemInstance>();
+
             if (GetTotalItemAmount(item) < amount)
                 return false;
 
@@ -177,6 +176,22 @@ namespace EmergoEntertainment.Inventory
                 items.Add(batch.Take(1)[0]);
             }
             UpdateEmptyBatches();
+            return true;
+        }
+        /// <summary>
+        /// Tries to remove a specific IItemInstance from this inventory
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="itemInstance"></param>
+        /// <returns></returns>
+        public bool TryTakeItemInstance(IItemInstance instance)
+        {
+            ItemBatch batch = itemBatches.FirstOrDefault(b => b.Has(instance));
+            if (batch == default)
+            {
+                return false;
+            }
+            batch.Take(instance);
             return true;
         }
 
@@ -219,6 +234,5 @@ namespace EmergoEntertainment.Inventory
             output = itemToItemBatch.Keys.OrderBy(orderbyParameter).ToList();
             return output;
         }
-
     }
 }
