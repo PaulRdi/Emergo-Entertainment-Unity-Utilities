@@ -35,6 +35,20 @@ namespace EmergoEntertainment.Inventory
 
             return itemToItemBatch[item].Sum(b => b.count);
         }
+        public bool HasItem(Item item, int amount = 0)
+        {
+            return itemBatches
+                .Where(batch => batch.item == item)
+                .Sum(batch => batch.count) 
+                    >= amount;
+        }
+
+        public bool HasItemInstance(IItemInstance itemInstance)
+        {
+            return itemBatches
+                .Where(batch => batch.item == itemInstance.data)
+                .Any(batch => batch.items.Contains(itemInstance));
+        }
 
         public void ConsumeItems(Item item, int amount)
         {
