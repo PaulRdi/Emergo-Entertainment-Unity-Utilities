@@ -116,7 +116,7 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
         }
 
         [UnityTest]
-        public IEnumerator TestQueryForItem()
+        public IEnumerator TestHasItem()
         {
             inventory.TryAddItem(item1);
             Assert.True(inventory.HasItem(item1));
@@ -128,7 +128,7 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
         }
 
         [UnityTest]
-        public IEnumerator TestQueryForItemInstance()
+        public IEnumerator TestHasItemInstance()
         {
             IItemInstance inst = ItemManager.CreateItemInstance(item1);
 
@@ -136,6 +136,20 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             Assert.True(inventory.HasItemInstance(inst));
             inventory.TryTakeItemInstance(inst);
             Assert.False(inventory.HasItemInstance(inst));
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TestQuery()
+        {
+            HashSet<IItemInstance> result;
+
+            Assert.False(inventory.Query(item1, out result));
+            inventory.TryAddItem(item1);
+            inventory.Query(item1, out result);
+
+            Assert.True(result.Count == 1);
+            Assert.True(result.Contains(inventory.itemBatches[0].items[0]));
             yield return null;
         }
         [SetUp]

@@ -51,6 +51,26 @@ namespace EmergoEntertainment.Inventory
                 .Any(batch => batch.items.Contains(itemInstance));
         }
 
+        public bool Query(Item item, out HashSet<IItemInstance> queriedInstances, int amount = 1)
+        {
+            queriedInstances = new HashSet<IItemInstance>();
+            if (!HasItem(item, amount))
+                return false;
+
+            int toPut = amount;
+            foreach (ItemBatch batch in itemBatches.Where(batch => batch.item == item))
+            {
+                int toTakeAmount = Math.Min(toPut, batch.count);
+                for (int i = 0; i < toTakeAmount; i++)
+                {
+                    queriedInstances.Add(batch.items[i]);
+                }
+                if (toTakeAmount == 0)
+                    break;
+            }
+            return true;                
+        }
+
         public void ConsumeItems(Item item, int amount)
         {
             List<ItemBatch> batches = itemBatches
