@@ -114,6 +114,30 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
 
 
         }
+
+        [UnityTest]
+        public IEnumerator TestQueryForItem()
+        {
+            inventory.TryAddItem(item1);
+            Assert.True(inventory.HasItem(item1));
+            Assert.False(inventory.HasItem(item1, 2));
+            inventory.TryTakeItems(item1, out List<IItemInstance> taken);
+            Assert.False(inventory.HasItem(item1));
+            yield return null;
+
+        }
+
+        [UnityTest]
+        public IEnumerator TestQueryForItemInstance()
+        {
+            IItemInstance inst = ItemManager.CreateItemInstance(item1);
+
+            inventory.TryAddItemInstance(inst);
+            Assert.True(inventory.HasItemInstance(inst));
+            inventory.TryTakeItemInstance(inst);
+            Assert.False(inventory.HasItemInstance(inst));
+            yield return null;
+        }
         [SetUp]
         public void SetUp()
         {
