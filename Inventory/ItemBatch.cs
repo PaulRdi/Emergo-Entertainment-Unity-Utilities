@@ -57,7 +57,7 @@ namespace EmergoEntertainment.Inventory
             return output;
         }
         /// <summary>
-        /// Returns the amount of items which were consumed.
+        /// Returns the items which were consumed.
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
@@ -75,15 +75,12 @@ namespace EmergoEntertainment.Inventory
         {
             if (inst.data.consumeOnUse)
                 toRemove.Add(inst);
-            inst.Cleanup();
-
         }
         public bool TryUseSingle(IItemInstance inst)
         {
             if (!items.Contains(inst))
                 return false;
             items.Remove(inst);
-            inst.Cleanup();
             return true;
         }
         public ItemBatch(IItemInstance instance)

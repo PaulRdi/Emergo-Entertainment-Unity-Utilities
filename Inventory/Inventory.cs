@@ -131,13 +131,13 @@ namespace EmergoEntertainment.Inventory
             }
             else
             {
-                if (!slotToItemBatch.Any(s => s.Value == null))
+                if (!slotToItemBatch.Any(s => s.Value.item == null))
                 {
                     return false;
                 }
                 ItemBatch batch = new ItemBatch(itemInstance);
                 itemBatches.Add(batch);
-                int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k] == null);
+                int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k].item == null);
                 slotToItemBatch[freeInventorySlotID] = batch;
                 AddBatch(itemInstance.data, batch);
             }
@@ -229,6 +229,7 @@ namespace EmergoEntertainment.Inventory
                 return false;
             }
             batch.Take(instance);
+            UpdateEmptyBatches();
             return true;
         }
 
