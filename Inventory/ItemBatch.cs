@@ -106,5 +106,18 @@ namespace EmergoEntertainment.Inventory
                 items.Add(item);
             }
         }
+
+        public bool Has(IItemInstance instance)
+        {
+            return items.Contains(instance);
+        }
+
+        public IItemInstance Take(IItemInstance instance)
+        {
+            if (!items.Contains(instance))
+                throw new Exception("Inventory did not have item instance " + instance.ToString());
+            items.Remove(instance);
+            return instance;
+        }
     }
 }
