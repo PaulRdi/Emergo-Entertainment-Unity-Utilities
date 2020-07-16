@@ -131,13 +131,13 @@ namespace EmergoEntertainment.Inventory
             }
             else
             {
-                if (!slotToItemBatch.Any(s => s.Value.item == null))
+                if (!slotToItemBatch.Any(s => s.Value == null))
                 {
                     return false;
                 }
                 ItemBatch batch = new ItemBatch(itemInstance);
                 itemBatches.Add(batch);
-                int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k].item == null);
+                int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k] == null);
                 slotToItemBatch[freeInventorySlotID] = batch;
                 AddBatch(itemInstance.data, batch);
             }
