@@ -91,7 +91,7 @@ namespace EmergoEntertainment.Inventory
             for (int i= 0; i < playerInventory.slotToItemBatch.Keys.Count; i++)
             {
                 InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
-                slotView.Init();
+                slotView.Init(this);
             }
         }
 

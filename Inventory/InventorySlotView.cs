@@ -32,9 +32,9 @@ namespace EmergoEntertainment.Inventory
             get; private set;
         }
 
-        public void Init()
+        public void Init(PlayerInventoryManager invManager)
         {
-            if (FindObjectOfType<PlayerInventoryManager>().TryRegisterSlotView(this, out int id))
+            if (invManager.TryRegisterSlotView(this, out int id))
             {
                 slotID = id;
             }
