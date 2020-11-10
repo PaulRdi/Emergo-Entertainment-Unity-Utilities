@@ -25,8 +25,6 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] Transform recipeListParent;
         [SerializeField] InventorySlotView inventorySlotPrefab;
         [SerializeField] Transform inventorySlotParent;
-        [SerializeField] int inventorySize;
-        [SerializeField] int maxBatchSize = 25;
         [SerializeField] bool useRecipes = false;
         [SerializeField] bool initOnAwake = false;
         public Camera eventCamera;
@@ -51,8 +49,11 @@ namespace EmergoEntertainment.Inventory
             if (_instance == null)
             {
                 if (inventory == default)
-                    inventory = new Inventory(maxBatchSize, inventorySize);
-
+                {
+                    inventory = new Inventory(1, 1);
+                    Debug.LogWarning("Did not provide an inventory on init. Initializing new inventory.");
+                }
+                
                 InitInventory(inventory);             
                 DontDestroyOnLoad(this.gameObject);
             }
@@ -87,7 +88,7 @@ namespace EmergoEntertainment.Inventory
             }
             currentID = 0;
 
-            for (int i= 0; i < inventorySize; i++)
+            for (int i= 0; i < playerInventory.slotToItemBatch.Keys.Count; i++)
             {
                 InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
                 slotView.Init();
@@ -184,7 +185,5 @@ namespace EmergoEntertainment.Inventory
                 slotToUI[slotID].UpdateItemSlot(playerInventory.slotToItemBatch[slotID]);
             }
         }
-
-
     }
 }
