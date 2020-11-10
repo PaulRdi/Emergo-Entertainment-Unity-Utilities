@@ -46,11 +46,14 @@ namespace EmergoEntertainment.Inventory
                 INIT();
         }
 
-        public void INIT()
+        public void INIT(Inventory inventory = default)
         {
             if (_instance == null)
             {
-                InitInventory();
+                if (inventory == default)
+                    inventory = new Inventory(maxBatchSize, inventorySize);
+
+                InitInventory(inventory);             
                 DontDestroyOnLoad(this.gameObject);
             }
             else
@@ -68,14 +71,14 @@ namespace EmergoEntertainment.Inventory
             }
         }
 
-        void InitInventory()
+        void InitInventory(Inventory inventory)
         {
             _instance = this;
+            playerInventory = inventory;
             buttonToRecipe = new Dictionary<RecipeButton, Recipe>();
             slotToUI = new Dictionary<int, InventorySlotView>();
             currentID = 0;
             InventorySlotView.Clicked += InventorySlot_Clicked;
-            playerInventory = new Inventory(maxBatchSize, inventorySize);
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             playerInventory.Updated += PlayerInventory_Updated;
             foreach (Recipe r in recipes)
