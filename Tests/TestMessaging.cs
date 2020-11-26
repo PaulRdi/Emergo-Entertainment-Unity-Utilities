@@ -4,6 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using EmergoEntertainment.Messaging;
+using System;
 
 namespace EmergoEntertainment.Tests
 {
@@ -30,7 +31,7 @@ namespace EmergoEntertainment.Tests
             MessageDistributor messageDistributor = new MessageDistributor();
             try
             {
-                MessageHub.StartListening(MessageType.ExampleMessageType, TestAction);
+                MessageHub.StartListening("TestMessage", TestAction);
             }
             catch (System.Exception e)
             {
@@ -39,7 +40,7 @@ namespace EmergoEntertainment.Tests
 
             try
             {
-                MessageHub.Enqueue(new Message(MessageType.ExampleMessageType, "Test", 42));
+                MessageHub.Enqueue(new Message("TestMessage", "Test", 42));
             }
             catch (System.Exception e)
             {
@@ -64,6 +65,22 @@ namespace EmergoEntertainment.Tests
                 Assert.Fail("Fail in message dequeue without message in queue \n" + e.Message);
             }
         }
+        [Test]
+        public void TestMessageUnsubscribe()
+        {
+            MessageDistributor dist = new MessageDistributor();
+            try
+            {
+                MessageHub.StartListening("Test", TestAction);
+                
+                MessageHub.StopListening("Test", TestAction);
+            }
+            catch (System.Exception e)
+            {
+                Assert.Fail("Fail in message dequeue without message in queue \n" + e.Message);
+            }
+        }
+
 
         void TestAction(Message m)
         {
@@ -72,14 +89,56 @@ namespace EmergoEntertainment.Tests
             Assert.AreEqual(m.data[1], 42);
         }
 
-        // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-        // `yield return null;` to skip a frame.
+        
         [UnityTest]
-        public IEnumerator TestMessagingWithEnumeratorPasses()
+        public IEnumerator TestMessagingGetData()
         {
-            // Use the Assert class to test conditions.
-            // Use yield to skip a frame.
+            MessageDistributor distributor = new MessageDistributor();
+
+            MessageHub.StartListening("TestDesync", TestDesync);
             yield return null;
+            MessageHub.Enqueue(new Message("TestDesync", "test"));
+            yield return null;
+            Assert.IsTrue(distributor.DequeueMessage());
+        }
+
+        private void TestDesync(Message obj)
+        {
+            try
+            {
+                Assert.IsTrue(obj.GetData<string>(out string s));
+                Assert.AreEqual(s, "test");
+            }
+            catch (System.Exception e)
+            {
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator TestMessagingDirectUnsubscribe()
+        {
+            MessageDistributor distributor = new MessageDistributor();
+
+            MessageHub.StartListening("TestDesync", TestDesyncUnsub);
+            yield return null;
+            MessageHub.Enqueue(new Message("TestDesync", "test", distributor));
+            yield return null;
+            Assert.IsTrue(distributor.DequeueMessage());
+        }
+
+        private void TestDesyncUnsub(Message obj)
+        {
+            try
+            {
+                Assert.IsTrue(obj.GetData<MessageDistributor>(out MessageDistributor dist));
+                dist.messageHub._StopListening("TestDesync", TestDesyncUnsub);
+            }
+            catch (System.Exception e)
+            {
+                Assert.Fail(e.Message);
+
+            }
         }
     }
 

@@ -6,13 +6,6 @@ using System.Text;
 
 namespace EmergoEntertainment.Messaging
 {
-    /// <summary>
-    /// Types of messages to be sent via the messaging system.
-    /// </summary>
-    public enum MessageType
-    {
-        ExampleMessageType = 0
-    }
     
     /// <summary>
     /// The base class for the messaging system.
@@ -32,27 +25,27 @@ namespace EmergoEntertainment.Messaging
         /// <summary>
         /// A dictionarly of actions mapped to message types. One message Type has multiple actions associated.
         /// </summary>
-        Dictionary<MessageType, List<MessageAction>> messageDict;
-        Dictionary<MessageType, List<MessageAction>> messageDictSyncList;
-        Dictionary<MessageType, List<MessageAction>> messageDictAddList;
+        Dictionary<string, List<MessageAction>> messageDict;
+        Dictionary<string, List<MessageAction>> messageDictSyncList;
+        Dictionary<string, List<MessageAction>> messageDictAddList;
 
-        Dictionary<MessageType, List<MessageAction<MessageReturnType>>> messageReturnDict;
-        Dictionary<MessageType, List<MessageAction<MessageReturnType>>> messageReturnDictSyncList;
-        Dictionary<MessageType, List<MessageAction<MessageReturnType>>> messageReturnDictAddList;
+        Dictionary<string, List<MessageAction<MessageReturnType>>> messageReturnDict;
+        Dictionary<string, List<MessageAction<MessageReturnType>>> messageReturnDictSyncList;
+        Dictionary<string, List<MessageAction<MessageReturnType>>> messageReturnDictAddList;
 
-        Dictionary<MessageType, Queue<Action<MessageReturnType>>> returningMessageFunctionPointers;
+        Dictionary<string, Queue<Action<MessageReturnType>>> returningMessageFunctionPointers;
 
         private MessageHub()
         {
             messageQueue = new Queue<Message>();
             messageReturnQueue = new Queue<Message>();
-            messageDict = new Dictionary<MessageType, List<MessageAction>>();
-            messageDictSyncList = new Dictionary<MessageType, List<MessageAction>>();
-            messageDictAddList = new Dictionary<MessageType, List<MessageAction>>();
-            messageReturnDict = new Dictionary<MessageType, List<MessageAction<MessageReturnType>>>();
-            messageReturnDictSyncList = new Dictionary<MessageType, List<MessageAction<MessageReturnType>>>();
-            messageReturnDictAddList = new Dictionary<MessageType, List<MessageAction<MessageReturnType>>>();
-            returningMessageFunctionPointers = new Dictionary<MessageType, Queue<Action<MessageReturnType>>>();
+            messageDict = new Dictionary<string, List<MessageAction>>();
+            messageDictSyncList = new Dictionary<string, List<MessageAction>>();
+            messageDictAddList = new Dictionary<string, List<MessageAction>>();
+            messageReturnDict = new Dictionary<string, List<MessageAction<MessageReturnType>>>();
+            messageReturnDictSyncList = new Dictionary<string, List<MessageAction<MessageReturnType>>>();
+            messageReturnDictAddList = new Dictionary<string, List<MessageAction<MessageReturnType>>>();
+            returningMessageFunctionPointers = new Dictionary<string, Queue<Action<MessageReturnType>>>();
         }
 
         public static void Create(IMessageDistributor distributor)
@@ -63,11 +56,11 @@ namespace EmergoEntertainment.Messaging
         }
 
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
-        public void _StartListening(MessageType msg, Action<Message> a, int p = 10, bool persist = false)
+        public void _StartListening(string msg, Action<Message> a, int p = 10, bool persist = false)
         {
             MessageAction messageAction = new MessageAction(a, p, persist);
             if (messageDict.ContainsKey(msg) && messageDict[msg].Contains(messageAction))
@@ -89,11 +82,11 @@ namespace EmergoEntertainment.Messaging
         }
 
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
-        public void _StartListening(MessageType msg, Func<Message, MessageReturnType> f, MethodPriority p = MethodPriority.Default, bool persist = false)
+        public void _StartListening(string msg, Func<Message, MessageReturnType> f, MethodPriority p = MethodPriority.Default, bool persist = false)
         {
             MessageAction<MessageReturnType> messageAction = new MessageAction<MessageReturnType>(f, p, persist);
             if (messageReturnDict.ContainsKey(msg) && messageReturnDict[msg].Contains(messageAction))
@@ -119,8 +112,9 @@ namespace EmergoEntertainment.Messaging
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
-        public void _StopListening(MessageType msg, Action<Message> a)
+        public void _StopListening(string msg, Action<Message> a)
         {
+            UpdateListeners();
             if (messageDict.ContainsKey(msg))
             {
                 MessageAction messageActionInMessageDict = messageDict[msg].FirstOrDefault(m => m.action == a);
@@ -152,8 +146,9 @@ namespace EmergoEntertainment.Messaging
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
-        public void _StopListening(MessageType msg, Func<Message, MessageReturnType> f)
+        public void _StopListening(string msg, Func<Message, MessageReturnType> f)
         {
+            UpdateReturnListeners();
             if (messageReturnDict.ContainsKey(msg))
             {
                 MessageAction<MessageReturnType> messageActionInMessageDict = messageReturnDict[msg].FirstOrDefault(m => m.action == f);
@@ -180,10 +175,10 @@ namespace EmergoEntertainment.Messaging
                 throw new MessagingException("You are trying to remove an action from message type " + msg + ". But noting is listening this message type.");
         }
 
-        public void _UnsubscribeForAllMessageTypes(Action<Message> a)
+        public void _UnsubscribeForAllMessages(Action<Message> a)
         {
             //currently has redundant check if message is registered. 
-            foreach (MessageType key in messageDict.Keys)
+            foreach (string key in messageDict.Keys)
             {
                 MessageAction inspecting = messageDict[key].FirstOrDefault(m => m.action == a);
                 if (inspecting != default(MessageAction))
@@ -192,10 +187,10 @@ namespace EmergoEntertainment.Messaging
                 }
             }
         }
-        public void _UnsubscribeForAllMessageTypes(Func<Message, MessageReturnType> f)
+        public void _UnsubscribeForAllMessages(Func<Message, MessageReturnType> f)
         {
             //currently has redundant check if message is registered. 
-            foreach (MessageType key in messageReturnDict.Keys)
+            foreach (string key in messageReturnDict.Keys)
             {
                 MessageAction<MessageReturnType> inspecting = messageReturnDict[key].FirstOrDefault(m => m.action == f);
                 if (inspecting != default(MessageAction<MessageReturnType>))
@@ -209,7 +204,7 @@ namespace EmergoEntertainment.Messaging
         /// </summary>
         public void SafeFlush()
         {
-            foreach (MessageType msg in messageDict.Keys)
+            foreach (string msg in messageDict.Keys)
             {
                 foreach (MessageAction action in messageDict[msg])
                 {
@@ -237,12 +232,12 @@ namespace EmergoEntertainment.Messaging
         /// </summary>
         public void Flush()
         {
-            Dictionary<MessageType, List<MessageAction>> persisting_messages = new Dictionary<MessageType, List<MessageAction>>();
-            Dictionary<MessageType, List<MessageAction>> persisting_syncs = new Dictionary<MessageType, List<MessageAction>>();
-            Dictionary<MessageType, List<MessageAction>> persisting_adds = new Dictionary<MessageType, List<MessageAction>>();
+            Dictionary<string, List<MessageAction>> persisting_messages = new Dictionary<string, List<MessageAction>>();
+            Dictionary<string, List<MessageAction>> persisting_syncs = new Dictionary<string, List<MessageAction>>();
+            Dictionary<string, List<MessageAction>> persisting_adds = new Dictionary<string, List<MessageAction>>();
 
             //Copy Messages from MessageDict flagged to persist flushing.
-            foreach (MessageType m in messageDict.Keys)
+            foreach (string m in messageDict.Keys)
             {
                 bool addflag = false;
                 foreach (MessageAction ma in messageDict[m])
@@ -259,7 +254,7 @@ namespace EmergoEntertainment.Messaging
                 }
             }
             //Copy Messages from MessageDictSyncList flagged to persist flushing.
-            foreach (MessageType m in messageDictSyncList.Keys)
+            foreach (string m in messageDictSyncList.Keys)
             {
                 bool addflag = false;
                 foreach (MessageAction ma in messageDictSyncList[m])
@@ -276,7 +271,7 @@ namespace EmergoEntertainment.Messaging
                 }
             }
             //Copy Messages from MessageDictAddList flagged to persist flushing.
-            foreach (MessageType m in messageDictAddList.Keys)
+            foreach (string m in messageDictAddList.Keys)
             {
                 bool addflag = false;
                 foreach (MessageAction ma in messageDictAddList[m])
@@ -302,14 +297,14 @@ namespace EmergoEntertainment.Messaging
             messageDictSyncList = persisting_syncs;
         }
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// References GameManager.instance.messageHub.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
         /// <param name="p">The priority with which the message shoudl be invoked</param>
         /// <param name="persist">Whether the Message should persist flushing (false by default)</param>
-        public static void StartListening(MessageType msg, Action<Message> a, MethodPriority p, bool persist)
+        public static void StartListening(string msg, Action<Message> a, MethodPriority p, bool persist)
         {
             try
             {
@@ -321,13 +316,13 @@ namespace EmergoEntertainment.Messaging
             }
         }
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// References GameManager.instance.messageHub.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
         /// <param name="p">The priority with which the message shoudl be invoked</param>
-        public static void StartListening(MessageType msg, Action<Message> a, MethodPriority p)
+        public static void StartListening(string msg, Action<Message> a, MethodPriority p)
         {
             try
             {
@@ -339,13 +334,13 @@ namespace EmergoEntertainment.Messaging
             }
         }
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// References GameManager.instance.messageHub.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
         /// <param name="p">The priority with which the message shoudl be invoked</param>
-        public static void StartListening(MessageType msg, Action<Message> a, int priority)
+        public static void StartListening(string msg, Action<Message> a, int priority)
         {
             try
             {
@@ -357,13 +352,14 @@ namespace EmergoEntertainment.Messaging
             }
         }
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// References GameManager.instance.messageHub.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
         /// <param name="p">The priority with which the message shoudl be invoked</param>
-        public static void StartListeningWithReturn(MessageType msg, Func<Message, MessageReturnType> f, MethodPriority p)
+        [Obsolete]
+        public static void StartListeningWithReturn(string msg, Func<Message, MessageReturnType> f, MethodPriority p)
         {
             try
             {
@@ -376,13 +372,13 @@ namespace EmergoEntertainment.Messaging
         }
 
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// References GameManager.instance.messageHub.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
         /// <param name="persist">Whether the Message should persist flushing (false by default)</param>
-        public static void StartListening(MessageType msg, Action<Message> a, bool persist)
+        public static void StartListening(string msg, Action<Message> a, bool persist)
         {
             try
             {
@@ -394,13 +390,13 @@ namespace EmergoEntertainment.Messaging
             }
         }
         /// <summary>
-        /// Subscribes an action to a MessageType. The action gets invoked everytime the messageQueue is popped.
+        /// Subscribes an action to a string. The action gets invoked everytime the messageQueue is popped.
         /// References GameManager.instance.messageHub.
         /// Uses Default message priority.
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
-        public static void StartListening(MessageType msg, Action<Message> a)
+        public static void StartListening(string msg, Action<Message> a)
         {
             try
             {
@@ -415,11 +411,11 @@ namespace EmergoEntertainment.Messaging
         /// Unsubscribes an action from all message types it is registered to.
         /// </summary>
         /// <param name="a"></param>
-        public static void UnsubscribeForAllMessageTypes(Action<Message> a)
+        public static void UnsubscribeForAllMessages(Action<Message> a)
         {
             try
             {
-                _distributor.messageHub._UnsubscribeForAllMessageTypes(a);
+                _distributor.messageHub._UnsubscribeForAllMessages(a);
             }
             catch (NullReferenceException e)
             {
@@ -432,7 +428,7 @@ namespace EmergoEntertainment.Messaging
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="a"></param>
-        public static void StopListening(MessageType msg, Action<Message> a)
+        public static void StopListening(string msg, Action<Message> a)
         {
             try
             {
@@ -453,7 +449,7 @@ namespace EmergoEntertainment.Messaging
         {
             if (messageDictSyncList.Keys.Count > 0)
             {
-                foreach (MessageType msgType in messageDictSyncList.Keys)
+                foreach (string msgType in messageDictSyncList.Keys)
                 {
                     for (int i = 0; i < messageDictSyncList[msgType].Count; i++)
                     {
@@ -494,7 +490,7 @@ namespace EmergoEntertainment.Messaging
         {
             if (messageReturnDictSyncList.Keys.Count > 0)
             {
-                foreach (MessageType msgType in messageReturnDictSyncList.Keys)
+                foreach (string msgType in messageReturnDictSyncList.Keys)
                 {
                     for (int i = 0; i < messageReturnDictSyncList[msgType].Count; i++)
                     {
@@ -534,7 +530,7 @@ namespace EmergoEntertainment.Messaging
         {
             if (messageDictAddList.Keys.Count > 0)
             {
-                foreach (MessageType msgType in messageDictAddList.Keys)
+                foreach (string msgType in messageDictAddList.Keys)
                 {
                     for (int i = 0; i < messageDictAddList[msgType].Count; i++)
                     {
@@ -562,7 +558,7 @@ namespace EmergoEntertainment.Messaging
         {
             if (messageReturnDictAddList.Keys.Count > 0)
             {
-                foreach (MessageType msgType in messageReturnDictAddList.Keys)
+                foreach (string msgType in messageReturnDictAddList.Keys)
                 {
                     for (int i = 0; i < messageReturnDictAddList[msgType].Count; i++)
                     {
@@ -631,7 +627,7 @@ namespace EmergoEntertainment.Messaging
         {
             if (messageDictSyncList.Keys.Count > 0)
             {
-                foreach (MessageType msgType in messageDictSyncList.Keys)
+                foreach (string msgType in messageDictSyncList.Keys)
                 {
                     for (int i = 0; i < messageDictSyncList[msgType].Count; i++)
                     {
@@ -643,7 +639,6 @@ namespace EmergoEntertainment.Messaging
                                 messageDict.Remove(msgType);
                         }
                     }
-
                 }
                 messageDictSyncList.Clear();
             }
