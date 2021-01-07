@@ -9,7 +9,7 @@ namespace EmergoEntertainment.Inventory
     public class Inventory
     {
         public event Action Updated;
-        public event Action<IItemInstance> ItemsAdded;
+        public event Action<IItemInstance> ItemAdded;
 
         public Dictionary<Item, List<ItemBatch>> itemToItemBatch;
         public List<ItemBatch> itemBatches;
@@ -127,7 +127,11 @@ namespace EmergoEntertainment.Inventory
                 b.fillLevel <= maxBatchSize - b.item.stackWeight);
             if (queriedBatch != default(ItemBatch))
             {
-                return queriedBatch.TryAdd(itemInstance);
+                if (queriedBatch.TryAdd(itemInstance))
+                {
+                    ItemAdded?.Invoke(itemInstance);
+                    return true;
+                }
             }
             else
             {
@@ -140,17 +144,19 @@ namespace EmergoEntertainment.Inventory
                 int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k] == null);
                 slotToItemBatch[freeInventorySlotID] = batch;
                 AddBatch(itemInstance.data, batch);
+                UpdateEmptyBatches();
+                ItemAdded?.Invoke(itemInstance);
+                return true;
             }
-            UpdateEmptyBatches();
-            return true;
+            return false;
         }
         public bool TryAddItem(Item item)
         {
             ItemBatch queriedBatch = itemBatches.FirstOrDefault(b => b.item == item && b.fillLevel < maxBatchSize);
-
+            IItemInstance itemInstance = default;
             if (queriedBatch != default(ItemBatch))
             {
-                queriedBatch.AddNew(1);
+                itemInstance = queriedBatch.AddNew(1)[0];
             }
             else
             {
@@ -158,13 +164,15 @@ namespace EmergoEntertainment.Inventory
                 {
                     return false;
                 }
-                ItemBatch batch = new ItemBatch(ItemManager.CreateItemInstance(item, null), 1);
+                itemInstance = ItemManager.CreateItemInstance(item, null);
+                ItemBatch batch = new ItemBatch(itemInstance, 1);
                 itemBatches.Add(batch);
                 int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k] == null);
                 slotToItemBatch[freeInventorySlotID] = batch;
                 AddBatch(item, batch);
             }
             UpdateEmptyBatches();
+            ItemAdded?.Invoke(itemInstance);
             return true;
         }
 

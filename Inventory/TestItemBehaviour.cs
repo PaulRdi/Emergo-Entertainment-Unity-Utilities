@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace EmergoEntertainment.Inventory
 {
-    public class DefaultItemInstanceBehaviour : MonoBehaviour, IItemBehaviour
+    public class TestItemBehaviour : MonoBehaviour, IItemBehaviour
     {
-        public Item data => _itemInstance.data;
+        public Item data => throw new NotImplementedException();
 
         public IItemInstance itemInstance => _itemInstance;
         IItemInstance _itemInstance;
 
         public event Action<IItemBehaviour> destroyed;
+
+        public void Cleanup()
+        {
+        }
 
         public bool Drop()
         {
@@ -23,10 +23,9 @@ namespace EmergoEntertainment.Inventory
 
         public ItemInstance<T> GetItemInstance<T>() where T : MonoBehaviour, IItemBehaviour
         {
-            if (itemInstance is T)
-                return this as ItemInstance<T>;
-
-            return null;
+            if (itemInstance is ItemInstance<T>)
+                return itemInstance as ItemInstance<T>;
+            return default;
         }
 
         public void SetItemInstance(IItemInstance itemInstance)
@@ -36,14 +35,7 @@ namespace EmergoEntertainment.Inventory
 
         public bool UseFromInventory()
         {
-            return true;
-        }
-
-        public void Cleanup()
-        {
-            Destroy(this.gameObject);
+            return false;
         }
     }
-
-
 }

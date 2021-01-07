@@ -33,21 +33,38 @@ namespace EmergoEntertainment.Inventory
                 return count * item.stackWeight;
             }
         }
-        public void AddNew(int amount)
-        {
-            for (int i = 0; i < amount; i++)
-            {
-                items.Add(ItemManager.CreateItemInstance(item));
-            }
-        }
-        public bool TryAdd(IItemInstance itemInstance)
+        private bool CanAddItemInstance(IItemInstance itemInstance)
         {
             if (item != itemInstance.data)
                 return false;
             if (items.Any(i => i == itemInstance))
                 return false;
-            items.Add(itemInstance);
-            return true;
+
+            return true;            
+        }
+        public List<IItemInstance> AddNew(int amount)
+        {
+            List<IItemInstance> addedInstances = new List<IItemInstance>();
+            for (int i = 0; i < amount; i++)
+            {                
+                IItemInstance itemInstance = ItemManager.CreateItemInstance(item);
+                if (!TryAdd(itemInstance))
+                {
+                    throw new System.Exception("Could not add item to inventory batch \n" + itemInstance?.ToString());
+                }
+                addedInstances.Add(itemInstance);
+            }
+
+            return addedInstances;
+        }
+        public bool TryAdd(IItemInstance itemInstance)
+        {
+            if (CanAddItemInstance(itemInstance))
+            {
+                items.Add(itemInstance);
+                return true;
+            }
+            return false;
         }
         public List<IItemInstance> Take(int amount)
         {

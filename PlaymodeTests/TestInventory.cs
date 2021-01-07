@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using EmergoEntertainment.Inventory;
+using System;
+using UnityEditor;
 
 namespace EmergoEntertainment.UnityUtilityPlaymodetests
 {
@@ -152,6 +155,18 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             Assert.True(result.Contains(inventory.itemBatches[0].items[0]));
             yield return null;
         }
+
+        [UnityTest]
+        public IEnumerator TestItemInstanceClass()
+        {
+            Item testData = 
+                AssetDatabase.LoadAssetAtPath<Item>("Assets/Prefabs/TestItem.asset");
+            Assert.True(inventory.TryAddItem(testData));
+            Assert.True(inventory.Query(testData, out HashSet<IItemInstance> queriedInstances));
+            Assert.True(queriedInstances.First().GetController<TestItemBehaviour>() != default);
+            yield return null;
+
+        }
         [SetUp]
         public void SetUp()
         {
@@ -161,8 +176,7 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             item1.name = "item1";
             item2 = ScriptableObject.CreateInstance<Item>();
             item2.name = "item2";
-        }
+        }   
 
-        
     }
 }

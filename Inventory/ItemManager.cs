@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Reflection;
 namespace EmergoEntertainment.Inventory
 {
     public class ItemManager
@@ -20,10 +21,11 @@ namespace EmergoEntertainment.Inventory
         public static IItemInstance CreateItemInstance(Item item)
         {
             if (item.prefab != null &&
-                item.prefab.TryGetComponent<IItem>(out IItem iitem))
+                item.prefab.TryGetComponent<IItemBehaviour>(out IItemBehaviour iitem))
             {
                 //if a prefab is assigned to the item create an instance by instantiating the prefab.
                 GameObject gameObjectInstance = GameObject.Instantiate(item.prefab);
+                iitem = gameObjectInstance.GetComponent<IItemBehaviour>();
                 return InstantiateGameObjectForItemInstance(iitem, gameObjectInstance, item);
             }
             else
@@ -36,10 +38,11 @@ namespace EmergoEntertainment.Inventory
         public static IItemInstance CreateItemInstance(Item item, Transform parent)
         {
             if (item.prefab != null &&
-                item.prefab.TryGetComponent<IItem>(out IItem iitem))
+                item.prefab.TryGetComponent<IItemBehaviour>(out IItemBehaviour iitem))
             {
                 //if a prefab is assigned to the item create an instance by instantiating the prefab.
                 GameObject gameObjectInstance = GameObject.Instantiate(item.prefab, parent);
+                iitem = gameObjectInstance.GetComponent<IItemBehaviour>();
                 return InstantiateGameObjectForItemInstance(iitem, gameObjectInstance, item);
             }
             else
@@ -52,18 +55,17 @@ namespace EmergoEntertainment.Inventory
         }
 
 
-        private static IItemInstance InstantiateGameObjectForItemInstance(IItem iitem, GameObject gameObjectInstance, Item item)
+        private static IItemInstance InstantiateGameObjectForItemInstance(IItemBehaviour iitem, GameObject gameObjectInstance, Item item)
         {
             gameObjectInstance.transform.position = Vector3.zero;
             gameObjectInstance.SetActive(false);
             IItemInstance itemInstance = null;
-            if (iitem != null)
+            if (iitem != default)
             {
-                itemInstance = ItemInstanceFactory(gameObjectInstance, iitem);
+                itemInstance = ItemInstanceFactory(gameObjectInstance, iitem, item);
             }
             else
             {
-
                 DefaultItemInstanceBehaviour behaviour = gameObjectInstance.AddComponent<DefaultItemInstanceBehaviour>();
                 ItemInstance<DefaultItemInstanceBehaviour> component = new ItemInstance<DefaultItemInstanceBehaviour>(behaviour, item, gameObjectInstance);
                 itemInstance = component;
@@ -74,37 +76,26 @@ namespace EmergoEntertainment.Inventory
             return itemInstance;
         }
 
-        static IItemInstance ItemInstanceFactory(GameObject gameObject, IItem item)
+        static IItemInstance ItemInstanceFactory(GameObject gameObject, IItemBehaviour it, Item data)
         {
-            IItemInstance instance = null;
-            //switchcase.
-            return instance;
-
-            IItemInstance Churn<T>(GameObject go, IItem it) where T : MonoBehaviour, IItem
-            {
-                T controller = gameObject.GetComponent<T>();
-                if (controller == null)
-                    throw new NullReferenceException("prefab didnt have correct controller component.");
-
-                ItemInstance<T> itemInstance = new ItemInstance<T>(controller, item.data, gameObject);
-                it.SetItemInstance(itemInstance);
-                it.destroyed += ItemDestroyed;
-                return itemInstance;
-            }
+            //ItemInstance<T> itemInstance = new ItemInstance<T>(controller, item.data, gameObject);
+            Type itemInstanceType = it.GetType();
+            Type classType = typeof(ItemInstance<>);
+            Type[] typeParams = new Type[] { itemInstanceType };
+            Type constructedType = classType.MakeGenericType(itemInstanceType);
+            IItemInstance itemInstance = Activator.CreateInstance(constructedType, it, data, gameObject) as IItemInstance;
+            it.SetItemInstance(itemInstance);
+            it.destroyed += ItemDestroyed;
+            return itemInstance;            
         }
 
-        private static void ItemDestroyed(IItem obj)
+        private static void ItemDestroyed(IItemBehaviour obj)
         {
             if (instance.itemInstances.Contains(obj.itemInstance))
             {
                 obj.itemInstance.Cleanup();
                 instance.itemInstances.Remove(obj.itemInstance);
             }
-        }
-
-        public static void RegisterItemInstance<T>(T controller, Item data) where T : MonoBehaviour, IItem
-        {
-            instance.itemInstances.Add(ItemInstanceFactory(controller.gameObject, controller));
         }
 
         public static IItemInstance CreateItemInstance(Item item, Vector3 position, bool active = false)

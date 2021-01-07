@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 namespace EmergoEntertainment.Inventory
 {
-    public class ItemInstance<T> : IItemInstance where T : MonoBehaviour, IItem
+    public class ItemInstance<T> : IItemInstance where T : MonoBehaviour, IItemBehaviour
     {
+        
+
         public GameObject gameObject => _gameObject;
         GameObject _gameObject;
 
         public T component => _component;
         T _component;
-
-
 
         public Item data => _data;
         Item _data;
@@ -31,11 +31,19 @@ namespace EmergoEntertainment.Inventory
             _data = data;
         }
 
-        public J GetController<J>() where J : MonoBehaviour, IItem
+        public J GetController<J>() where J : MonoBehaviour, IItemBehaviour
         {
             if (component is J)
                 return component as J;
-            return null;
+            return default;
+        }
+
+        public bool TryGetController<J> (out J controller) where J : MonoBehaviour, IItemBehaviour
+        {
+            controller = GetController<J>();
+            if (controller == default)
+                return false;
+            return true;
         }
 
         public void Cleanup()

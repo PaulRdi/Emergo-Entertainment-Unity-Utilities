@@ -11,7 +11,7 @@ namespace EmergoEntertainment.Inventory
     {
         Item data { get; }
         GameObject gameObject { get; }
-        T GetController<T>() where T : MonoBehaviour, IItem;
+        T GetController<T>() where T : MonoBehaviour, IItemBehaviour;
         void Cleanup();
         bool UseFromInventory();
         bool Drop();

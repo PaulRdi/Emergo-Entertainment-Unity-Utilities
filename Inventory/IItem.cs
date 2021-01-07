@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using UnityEngine;
 namespace EmergoEntertainment.Inventory
 {
-    public interface IItem
+    public interface IItemBehaviour
     {
-        ItemInstance<T> GetItemInstance<T>() where T : MonoBehaviour, IItem;
+        ItemInstance<T> GetItemInstance<T>() where T : MonoBehaviour, IItemBehaviour;
         Item data { get; }
         IItemInstance itemInstance { get; }
         void SetItemInstance(IItemInstance itemInstance);
-        event Action<IItem> destroyed;
+        event Action<IItemBehaviour> destroyed;
         bool UseFromInventory();
         bool Drop();
         void Cleanup();
