@@ -10,6 +10,10 @@ using UnityEditor;
 
 namespace EmergoEntertainment.UnityUtilityPlaymodetests
 {
+    class ModifiedItem : Item
+    {
+        public string modifiedName;
+    }
     public class TestInventory
     {
         ItemManager itemManager;
@@ -166,6 +170,27 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             Assert.True(queriedInstances.First().GetController<TestItemBehaviour>() != default);
             yield return null;
 
+        }
+
+        [UnityTest]
+        public IEnumerator TestItemInstanceGetData()
+        {
+            ModifiedItem modItem = ModifiedItem.CreateInstance<ModifiedItem>();
+            modItem.name = "test mod item";
+            modItem.modifiedName = "mod name";
+
+            inventory.TryAddItem(modItem);
+            Assert.IsTrue(inventory.Query(modItem, out HashSet<IItemInstance> result));
+
+            Assert.IsTrue(result.Count == 1);
+            foreach (var res in result)
+            {
+                Assert.IsTrue(res.TryGetData<ModifiedItem>(out ModifiedItem modItemInstanceData));
+                Assert.IsTrue(modItemInstanceData.modifiedName == "mod name");
+                Assert.IsTrue(res.GetData<ModifiedItem>().modifiedName == "mod name");
+            }
+
+            yield return null;
         }
         [SetUp]
         public void SetUp()

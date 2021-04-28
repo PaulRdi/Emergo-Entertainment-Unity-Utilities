@@ -7,8 +7,7 @@ using UnityEngine;
 namespace EmergoEntertainment.Inventory
 {
     public class ItemInstance<T> : IItemInstance where T : MonoBehaviour, IItemBehaviour
-    {
-        
+    {       
 
         public GameObject gameObject => _gameObject;
         GameObject _gameObject;
@@ -54,6 +53,25 @@ namespace EmergoEntertainment.Inventory
         public bool Drop()
         {
             return component.Drop();
+        }
+
+        public T1 GetData<T1>() where T1 : Item
+        {
+            if (this.data.GetType() == typeof(T1))
+                return this.data as T1;
+            return default;
+        }
+
+        public bool TryGetData<T1>(out T1 data) where T1 : Item
+        {
+            data = default;
+            if (this.data != default &&
+                this.data.GetType() == typeof(T1))
+            {
+                data = this.data as T1;
+                return true;
+            }
+            return false;
         }
     }
 
