@@ -36,7 +36,7 @@ namespace EmergoEntertainment.Inventory
             get; private set;
         }
 
-        public void Init(IInventoryUI invManager)
+        public void Init(IInventoryUI invManager, Canvas canvas)
         {
             if (invManager.TryRegisterSlotView(this, out int id))
             {
@@ -52,7 +52,7 @@ namespace EmergoEntertainment.Inventory
             if (dragObject == null)
             {
                 dragObject = new GameObject("Drag Object", typeof(RectTransform), typeof(Image));
-                dragObject.transform.SetParent(PlayerInventoryManager.instance.transform);
+                dragObject.transform.SetParent(canvas.transform);
                 dragObject.SetActive(false);
                 dragObject.GetComponent<Image>().raycastTarget = false;
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50.0f);
@@ -98,9 +98,6 @@ namespace EmergoEntertainment.Inventory
 
         internal void SetEventCamera(Camera eventCamera)
         {
-            if (eventCamera == null)
-                eventCamera = FindObjectOfType<Camera>();
-
             this.eventCamera = eventCamera;
         }
 
@@ -115,9 +112,12 @@ namespace EmergoEntertainment.Inventory
 
             DragReleased?.Invoke(this, eventData.position);
 
-            if (PlayerInventoryManager.instance.trashObject != null &&
+            if (PlayerInventoryManager.instance != null &&
+                PlayerInventoryManager.instance.trashObject != null &&
                 res.Any(r => r.gameObject == PlayerInventoryManager.instance.trashObject.gameObject))
+            {
                 DraggedToTrash?.Invoke(this);
+            }
 
 
             if (eventCamera != null)

@@ -14,8 +14,12 @@ namespace EmergoEntertainment.Inventory
         {
             get
             {
-                _instance.dirty = true;
-                return _instance;
+                if (_instance != null)
+                {
+                    _instance.dirty = true;
+                    return _instance;
+                }
+                return default;
             }
         }
         static PlayerInventoryManager _instance;
@@ -27,6 +31,7 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] Transform inventorySlotParent;
         [SerializeField] bool useRecipes = false;
         [SerializeField] bool initOnAwake = false;
+        [SerializeField] Canvas canvas;
         public Camera eventCamera { get; private set; }
 
         Dictionary<int, InventorySlotView> slotToUI;
@@ -78,6 +83,11 @@ namespace EmergoEntertainment.Inventory
             playerInventory = inventory;
             buttonToRecipe = new Dictionary<RecipeButton, Recipe>();
             slotToUI = new Dictionary<int, InventorySlotView>();
+            if (this.canvas == null)
+
+            {
+                throw new UnityEngine.MissingReferenceException("Player Inventory Manager did not have canvas assigned");
+            }
             currentID = 0;
             InventorySlotView.Clicked += InventorySlot_Clicked;
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
@@ -91,7 +101,7 @@ namespace EmergoEntertainment.Inventory
             for (int i= 0; i < playerInventory.slotToItemBatch.Keys.Count; i++)
             {
                 InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
-                slotView.Init(this);
+                slotView.Init(this, canvas);
             }
         }
 
