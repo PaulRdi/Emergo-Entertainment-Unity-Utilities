@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 namespace EmergoEntertainment.Inventory
 {
-    public class PlayerInventoryManager : MonoBehaviour
+    public class PlayerInventoryManager : MonoBehaviour, IInventoryUI
     {
         public static PlayerInventoryManager instance
         {
@@ -27,7 +27,7 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] Transform inventorySlotParent;
         [SerializeField] bool useRecipes = false;
         [SerializeField] bool initOnAwake = false;
-        public Camera eventCamera;
+        public Camera eventCamera { get; private set; }
 
         Dictionary<int, InventorySlotView> slotToUI;
         Dictionary<RecipeButton, Recipe> buttonToRecipe;
@@ -104,7 +104,7 @@ namespace EmergoEntertainment.Inventory
         {
             PhysicsRaycaster raycaster = FindObjectOfType<PhysicsRaycaster>();
             if (raycaster == null)
-                Debug.LogWarning("There was no physics raycaster in the scene you loaded. Inventory Pointer callbacks may not work as intended.");
+                Debug.LogError("There was no physics raycaster in the scene you loaded. Inventory Pointer callbacks may not work as intended.");
             else
             {
                 eventCamera = raycaster.GetComponent<Camera>();
@@ -164,7 +164,7 @@ namespace EmergoEntertainment.Inventory
             }
         }
 
-        internal bool TryRegisterSlotView(InventorySlotView inventorySlot, out int id)
+        public bool TryRegisterSlotView(InventorySlotView inventorySlot, out int id)
         {
             id = currentID;
             if (playerInventory.slotToItemBatch.ContainsKey(currentID) &&

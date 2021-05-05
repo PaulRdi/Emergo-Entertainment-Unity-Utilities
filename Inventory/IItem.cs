@@ -8,6 +8,7 @@ namespace EmergoEntertainment.Inventory
 {
     public interface IItemBehaviour
     {
+
         ItemInstance<T> GetItemInstance<T>() where T : MonoBehaviour, IItemBehaviour;
         Item data { get; }
         IItemInstance itemInstance { get; }

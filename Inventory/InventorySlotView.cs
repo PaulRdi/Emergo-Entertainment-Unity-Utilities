@@ -14,7 +14,11 @@ namespace EmergoEntertainment.Inventory
     {
         public static event Action<InventorySlotView> Clicked;
         public static event Action<InventorySlotView> DraggedToTrash;
+        /// <summary>
+        /// Called when an 
+        /// </summary>
         public static event Action<InventorySlotView, GameObject> DraggedToWorldSpaceObject;
+        public static event Action<InventorySlotView, Vector2> DragReleased;
         static GameObject dragObject;
         Camera eventCamera;
         [SerializeField] TextMeshProUGUI stackSizeText;
@@ -32,7 +36,7 @@ namespace EmergoEntertainment.Inventory
             get; private set;
         }
 
-        public void Init(PlayerInventoryManager invManager)
+        public void Init(IInventoryUI invManager)
         {
             if (invManager.TryRegisterSlotView(this, out int id))
             {
@@ -54,6 +58,7 @@ namespace EmergoEntertainment.Inventory
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50.0f);
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50.0f);
             }
+            this.eventCamera = invManager.eventCamera;
 
         }
 
@@ -107,6 +112,9 @@ namespace EmergoEntertainment.Inventory
 
             List<RaycastResult> res = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, res);
+
+            DragReleased?.Invoke(this, eventData.position);
+
             if (PlayerInventoryManager.instance.trashObject != null &&
                 res.Any(r => r.gameObject == PlayerInventoryManager.instance.trashObject.gameObject))
                 DraggedToTrash?.Invoke(this);
@@ -124,6 +132,7 @@ namespace EmergoEntertainment.Inventory
                     }
                 }
             }
+
 
             dragObject.SetActive(false);
             dragging = false;
