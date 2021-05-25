@@ -20,9 +20,9 @@ namespace EmergoEntertainment.Inventory
         public static event Action<InventorySlotView, GameObject> DraggedToWorldSpaceObject;
         public static event Action<InventorySlotView, Vector2> DragReleased;
 
-        public event Action clicked;
-        public event Action<GameObject> draggedToWorldSpaceObject;
-        public event Action<Vector2> dragReleased;
+        public event Action<InventorySlotView> clicked;
+        public event Action<InventorySlotView, GameObject> draggedToWorldSpaceObject;
+        public event Action<InventorySlotView, Vector2> dragReleased;
 
         static GameObject dragObject;
         Camera eventCamera;
@@ -87,7 +87,7 @@ namespace EmergoEntertainment.Inventory
 
         private void ButtonClicked()
         {
-            clicked.Invoke();
+            clicked.Invoke(this);
             Clicked?.Invoke(this);
         }
 
@@ -115,7 +115,7 @@ namespace EmergoEntertainment.Inventory
             List<RaycastResult> res = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, res);
 
-            dragReleased?.Invoke(eventData.position);
+            dragReleased?.Invoke(this, eventData.position);
             DragReleased?.Invoke(this, eventData.position);
 
             if (PlayerInventoryManager.instance != null &&
@@ -131,7 +131,7 @@ namespace EmergoEntertainment.Inventory
                 ray = eventCamera.ScreenPointToRay(Input.mousePosition);
                 foreach (RaycastHit hit in Physics.RaycastAll(ray, float.MaxValue, dragMask))
                 {
-                    draggedToWorldSpaceObject?.Invoke(hit.transform.gameObject);
+                    draggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
                     DraggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
                     foreach (IInventorySlotInteractable slotInteractable in hit.transform.gameObject.GetComponents<IInventorySlotInteractable>())
                     {
