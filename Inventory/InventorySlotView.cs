@@ -19,6 +19,11 @@ namespace EmergoEntertainment.Inventory
         /// </summary>
         public static event Action<InventorySlotView, GameObject> DraggedToWorldSpaceObject;
         public static event Action<InventorySlotView, Vector2> DragReleased;
+
+        public event Action clicked;
+        public event Action<GameObject> draggedToWorldSpaceObject;
+        public event Action<Vector2> dragReleased;
+
         static GameObject dragObject;
         Camera eventCamera;
         [SerializeField] TextMeshProUGUI stackSizeText;
@@ -82,8 +87,8 @@ namespace EmergoEntertainment.Inventory
 
         private void ButtonClicked()
         {
+            clicked.Invoke();
             Clicked?.Invoke(this);
-
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -110,6 +115,7 @@ namespace EmergoEntertainment.Inventory
             List<RaycastResult> res = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, res);
 
+            dragReleased?.Invoke(eventData.position);
             DragReleased?.Invoke(this, eventData.position);
 
             if (PlayerInventoryManager.instance != null &&
@@ -123,8 +129,9 @@ namespace EmergoEntertainment.Inventory
             if (eventCamera != null)
             {
                 ray = eventCamera.ScreenPointToRay(Input.mousePosition);
-                foreach (RaycastHit hit in Physics.RaycastAll(ray, float.MaxValue, dragMask))                {
-
+                foreach (RaycastHit hit in Physics.RaycastAll(ray, float.MaxValue, dragMask))
+                {
+                    draggedToWorldSpaceObject?.Invoke(hit.transform.gameObject);
                     DraggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
                     foreach (IInventorySlotInteractable slotInteractable in hit.transform.gameObject.GetComponents<IInventorySlotInteractable>())
                     {
