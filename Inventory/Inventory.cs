@@ -280,5 +280,18 @@ namespace EmergoEntertainment.Inventory
             output = itemToItemBatch.Keys.OrderBy(orderbyParameter).ToList();
             return output;
         }
+
+        public List<IItemInstance> Empty()
+        {
+            itemToItemBatch.Clear();
+            List<IItemInstance> items = new List<IItemInstance>();
+            foreach(ItemBatch batch in itemBatches)
+            {
+                items.AddRange(batch.Empty());
+            }
+
+            UpdateEmptyBatches();
+            return items;
+        }
     }
 }

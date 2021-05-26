@@ -133,5 +133,12 @@ namespace EmergoEntertainment.Inventory
             items.Remove(instance);
             return instance;
         }
+
+        public List<IItemInstance> Empty()
+        {
+            List<IItemInstance> items = new List<IItemInstance>(this.items);
+            this.items.Clear();
+            return items;
+        }
     }
 }

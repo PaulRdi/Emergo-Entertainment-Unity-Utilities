@@ -192,6 +192,23 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
 
             yield return null;
         }
+
+        [UnityTest]
+        public IEnumerator TestEmptyInventory()
+        {
+            Assert.IsTrue(inventory.TryAddItem(item1));
+            Assert.IsTrue(inventory.TryAddItem(item2));
+
+            List<IItemInstance> items = inventory.Empty();
+
+            Assert.IsTrue(items.Count == 2);
+            Assert.IsTrue(items.Any(i => i.data == item1));
+            Assert.IsTrue(items.Any(i => i.data == item2));
+            Assert.IsFalse(inventory.HasItem(item1));
+            Assert.IsFalse(inventory.HasItem(item2));
+            yield return null;
+
+        }
         [SetUp]
         public void SetUp()
         {
