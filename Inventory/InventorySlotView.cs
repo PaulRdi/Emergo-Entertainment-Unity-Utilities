@@ -87,7 +87,7 @@ namespace EmergoEntertainment.Inventory
 
         private void ButtonClicked()
         {
-            clicked.Invoke(this);
+            clicked?.Invoke(this);
             Clicked?.Invoke(this);
         }
 
