@@ -100,6 +100,9 @@ namespace EmergoEntertainment.Inventory
             items.Remove(inst);
             return true;
         }
+        public ItemBatch() {
+            this.items = new List<IItemInstance>();
+        }
         public ItemBatch(IItemInstance instance)
         {
             this.items = new List<IItemInstance>();

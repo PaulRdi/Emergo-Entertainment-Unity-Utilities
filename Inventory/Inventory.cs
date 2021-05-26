@@ -201,6 +201,29 @@ namespace EmergoEntertainment.Inventory
             return true;
         }
 
+        public bool TryAddItemInstanceToSlot(int slotID, IItemInstance itemInstance)
+        {
+            if (!slotToItemBatch.ContainsKey(slotID))
+                return false;
+            if (HasItemInstance(itemInstance))
+                return false;
+
+            ItemBatch batch = slotToItemBatch[slotID];
+
+
+            if (batch == default)
+            {
+                batch = new ItemBatch(itemInstance);
+                slotToItemBatch[slotID] = batch;
+                AddBatch(itemInstance.data, slotToItemBatch[slotID]);
+                return true;
+            }
+            else if (batch.item != itemInstance.data)
+                return false;
+
+            return batch.TryAdd(itemInstance);
+        }
+
         public int GetTotalItemAmount (Item item)
         {
             return itemToItemBatch.Where(kvp => kvp.Key == item)

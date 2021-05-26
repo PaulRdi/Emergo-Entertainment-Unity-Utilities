@@ -209,6 +209,19 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             yield return null;
 
         }
+
+        [UnityTest]
+        public IEnumerator TestSlotAddAndTake()
+        {
+            IItemInstance instance = ItemManager.CreateItemInstance(item1);
+            List<IItemInstance> items;
+            Assert.False(inventory.TryAddItemInstanceToSlot(19337, instance));
+            Assert.True(inventory.TryAddItemInstanceToSlot(1, instance));
+            Assert.False(inventory.TryTakeItemFromSlot(0, out items));
+            Assert.True(inventory.TryTakeItemFromSlot(1, out items));
+
+            yield return null;
+        }
         [SetUp]
         public void SetUp()
         {
