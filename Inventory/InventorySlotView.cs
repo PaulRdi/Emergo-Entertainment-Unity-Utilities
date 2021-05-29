@@ -129,11 +129,19 @@ namespace EmergoEntertainment.Inventory
             if (eventCamera != null)
             {
                 ray = eventCamera.ScreenPointToRay(Input.mousePosition);
-                foreach (RaycastHit hit in Physics.RaycastAll(ray, float.MaxValue, dragMask))
+                RaycastHit[] hits = Physics.RaycastAll(ray, float.MaxValue, dragMask);
+                RaycastHit2D[] hits2D = Physics2D.GetRayIntersectionAll(ray, float.MaxValue, dragMask);
+
+                IEnumerable<GameObject> intersectedObjects = 
+                    hits.Select(h => h.collider.gameObject)
+                    .Concat(
+                        hits2D.Select(h2d => h2d.collider.gameObject));
+
+                foreach (GameObject go in intersectedObjects)
                 {
-                    draggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
-                    DraggedToWorldSpaceObject?.Invoke(this, hit.transform.gameObject);
-                    foreach (IInventorySlotInteractable slotInteractable in hit.transform.gameObject.GetComponents<IInventorySlotInteractable>())
+                    draggedToWorldSpaceObject?.Invoke(this, go);
+                    DraggedToWorldSpaceObject?.Invoke(this, go);
+                    foreach (IInventorySlotInteractable slotInteractable in go.GetComponents<IInventorySlotInteractable>())
                     {
                         slotInteractable.InventorySlotDroppedOnObject(this);
                     }
