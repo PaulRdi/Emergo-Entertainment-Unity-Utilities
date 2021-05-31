@@ -18,6 +18,10 @@ namespace EmergoEntertainment.Inventory
 
         public Sprite Icon { get => icon; }
         [SerializeField] Sprite icon;
+        public void SetIcon(Sprite icon)
+        {
+            this.icon = icon;
+        }
 
         public string Description { get => description; }
         [SerializeField] [TextArea] string description;
