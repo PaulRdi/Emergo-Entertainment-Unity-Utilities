@@ -222,6 +222,22 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
 
             yield return null;
         }
+        [UnityTest]
+        public IEnumerator TestCanAddItem()
+        {
+            Assert.True(inventory.CanAddItem(item1));
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.CanAddItem(item2));
+            Assert.True(inventory.TryAddItem(item2));
+            //should still be able to add items after we added one item because we can keep multiple in each stack.
+            Assert.True(inventory.CanAddItem(item1));
+            Assert.True(inventory.CanAddItem(item2));
+            //cannot add item 3 because we only have 2 slots in inventory
+            Assert.False(inventory.CanAddItem(item3));
+            Assert.True(inventory.TryTakeItems(item1, out List<IItemInstance> taken));
+            Assert.True(inventory.CanAddItem(item3));
+            yield return null;
+        }
         [SetUp]
         public void SetUp()
         {
@@ -231,6 +247,8 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             item1.name = "item1";
             item2 = ScriptableObject.CreateInstance<Item>();
             item2.name = "item2";
+            item3 = ScriptableObject.CreateInstance<Item>();
+            item3.name = "item3";
         }   
 
     }
