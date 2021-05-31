@@ -9,6 +9,10 @@ namespace EmergoEntertainment.Inventory
     {
         public GameObject prefab => _prefab;
         [SerializeField] GameObject _prefab;
+        public void SetPrefab(GameObject prefab)
+        {
+            this._prefab = prefab;
+        }
 
         public bool consumeOnUse => _consumeOnUse;
         [SerializeField] bool _consumeOnUse = true;
