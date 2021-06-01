@@ -10,6 +10,11 @@ namespace EmergoEntertainment.Inventory
 {
     public class PlayerInventoryManager : MonoBehaviour, IInventoryUI
     {
+        /// <summary>
+        /// The slot id from the player inventory and the associated items which were dragged to the trash object.
+        /// </summary>
+        public event Action<InventorySlotView, List<IItemInstance>> itemsDraggedToTrash;
+
         public static PlayerInventoryManager instance
         {
             get
@@ -34,7 +39,7 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] Canvas canvas;
         public Camera eventCamera { get; private set; }
 
-        Dictionary<int, InventorySlotView> slotToUI;
+        public Dictionary<int, InventorySlotView> slotToUI;
         Dictionary<RecipeButton, Recipe> buttonToRecipe;
         bool dirty;
 
@@ -89,7 +94,6 @@ namespace EmergoEntertainment.Inventory
                 throw new UnityEngine.MissingReferenceException("Player Inventory Manager did not have canvas assigned");
             }
             currentID = 0;
-            InventorySlotView.Clicked += InventorySlot_Clicked;
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             playerInventory.Updated += PlayerInventory_Updated;
             foreach (Recipe r in recipes)
@@ -102,7 +106,18 @@ namespace EmergoEntertainment.Inventory
             {
                 InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
                 slotView.Init(this, canvas);
+                slotView.draggedToTrash += SlotView_DraggedToTrash;
             }
+        }
+
+        private void SlotView_DraggedToTrash(InventorySlotView obj)
+        {
+            if (playerInventory.TryTakeItemFromSlot(obj.slotID, out List<IItemInstance> items))
+            {
+                itemsDraggedToTrash?.Invoke(obj, items);
+                return;
+            }
+            itemsDraggedToTrash?.Invoke(obj, new List<IItemInstance>());
         }
 
         private void PlayerInventory_Updated()
@@ -158,19 +173,6 @@ namespace EmergoEntertainment.Inventory
             else
             {
                 Debug.Log("could not craft");
-            }
-        }
-
-
-        private void InventorySlot_Clicked(InventorySlotView obj)
-        {
-            if (playerInventory.slotToItemBatch[obj.slotID] == null)
-            {
-                //had an item
-            }
-            else
-            {
-                //did not have an item
             }
         }
 
