@@ -35,13 +35,13 @@ namespace EmergoEntertainment.Inventory
         }
         public bool HasItem(Item item, int amount = 1)
         {
-
-            return 
-                amount == 0 ? true :
-                itemBatches
+            bool checkBatches = itemBatches
                 .Where(batch => batch.item == item)
-                .Sum(batch => batch.count) 
+                .Sum(batch => batch.count)
                     >= amount;
+
+            return amount == 0 ? true : checkBatches;
+                
         }
 
         public bool HasItemInstance(IItemInstance itemInstance)
@@ -132,6 +132,7 @@ namespace EmergoEntertainment.Inventory
                     ItemAdded?.Invoke(itemInstance);
                     return true;
                 }
+                return false;
             }
             else
             {
@@ -139,24 +140,23 @@ namespace EmergoEntertainment.Inventory
                 {
                     return false;
                 }
-                ItemBatch batch = new ItemBatch(itemInstance);
-                itemBatches.Add(batch);
-                int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k] == null);
-                slotToItemBatch[freeInventorySlotID] = batch;
-                AddBatch(itemInstance.data, batch);
-                UpdateEmptyBatches();
+                CreateNewItemBatch(itemInstance.data, itemInstance);
                 ItemAdded?.Invoke(itemInstance);
                 return true;
             }
-            return false;
         }
         public bool TryAddItem(Item item)
         {
-            ItemBatch queriedBatch = itemBatches.FirstOrDefault(b => b.item == item && b.fillLevel < maxBatchSize);
+            ItemBatch queriedBatch = itemBatches.FirstOrDefault(
+                b =>
+                b.item == item &&
+                b.fillLevel < maxBatchSize - item.stackWeight);
             IItemInstance itemInstance = default;
             if (queriedBatch != default(ItemBatch))
             {
                 itemInstance = queriedBatch.AddNew(1)[0];
+                ItemAdded?.Invoke(itemInstance);
+                return true;
             }
             else
             {
@@ -165,15 +165,32 @@ namespace EmergoEntertainment.Inventory
                     return false;
                 }
                 itemInstance = ItemManager.CreateItemInstance(item, null);
-                ItemBatch batch = new ItemBatch(itemInstance, 1);
-                itemBatches.Add(batch);
+                CreateNewItemBatch(item, itemInstance);
+                UpdateEmptyBatches();
+                ItemAdded?.Invoke(itemInstance);
+                return true;
+            }
+        }
+
+        private ItemBatch CreateNewItemBatch(Item item, IItemInstance itemInstance, int slotId = -1)
+        {
+            if (slotToItemBatch.All(s => s.Value != null && s.Value.item != default))
+                return default;
+            ItemBatch batch = new ItemBatch(itemInstance, 1);
+            itemBatches.Add(batch);
+            if (slotId == -1)
+            {
                 int freeInventorySlotID = slotToItemBatch.Keys.First(k => slotToItemBatch[k] == null);
                 slotToItemBatch[freeInventorySlotID] = batch;
-                AddBatch(item, batch);
             }
+            else
+            {
+                if (slotId < 0)
+                slotToItemBatch[slotId] = batch;
+            }
+            AddBatch(item, batch);
             UpdateEmptyBatches();
-            ItemAdded?.Invoke(itemInstance);
-            return true;
+            return batch;
         }
 
         private void AddBatch(Item item, ItemBatch batch)
@@ -213,9 +230,7 @@ namespace EmergoEntertainment.Inventory
 
             if (batch == default)
             {
-                batch = new ItemBatch(itemInstance);
-                slotToItemBatch[slotID] = batch;
-                AddBatch(itemInstance.data, slotToItemBatch[slotID]);
+                slotToItemBatch[slotID] = CreateNewItemBatch(itemInstance.data, itemInstance, slotID);
                 return true;
             }
             else if (batch.item != itemInstance.data)
