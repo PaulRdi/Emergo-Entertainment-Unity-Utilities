@@ -39,7 +39,6 @@ namespace EmergoEntertainment.Inventory
                 return false;
             if (items.Any(i => i == itemInstance))
                 return false;
-
             return true;            
         }
         public List<IItemInstance> AddNew(int amount)

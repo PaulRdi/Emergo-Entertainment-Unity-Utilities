@@ -115,7 +115,7 @@ namespace EmergoEntertainment.Inventory
 
         public bool CanAddItem(Item item)
         {
-            ItemBatch queriedBatch = itemBatches.FirstOrDefault(b => b.item == item && b.count < maxBatchSize);
+            ItemBatch queriedBatch = itemBatches.FirstOrDefault(b => b.item == item && b.count+item.stackWeight <= maxBatchSize);
             return queriedBatch != default(ItemBatch) || slotToItemBatch.Any(s => s.Value == null);
         }
         public bool TryAddItemInstance(IItemInstance itemInstance)
@@ -150,7 +150,7 @@ namespace EmergoEntertainment.Inventory
             ItemBatch queriedBatch = itemBatches.FirstOrDefault(
                 b =>
                 b.item == item &&
-                b.fillLevel < maxBatchSize - item.stackWeight);
+                b.fillLevel <= maxBatchSize - item.stackWeight);
             IItemInstance itemInstance = default;
             if (queriedBatch != default(ItemBatch))
             {
