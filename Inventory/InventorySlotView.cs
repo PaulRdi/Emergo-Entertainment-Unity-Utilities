@@ -24,7 +24,7 @@ namespace EmergoEntertainment.Inventory
         public event Action<InventorySlotView, GameObject> draggedToWorldSpaceObject;
         public event Action<InventorySlotView, Vector2> dragReleased;
         public event Action<InventorySlotView> draggedToTrash;
-
+        public event Action<InventorySlotView> updated;
         static GameObject dragObject;
         Camera eventCamera;
         [SerializeField] TextMeshProUGUI stackSizeText;
@@ -84,6 +84,7 @@ namespace EmergoEntertainment.Inventory
                 stackSizeText.gameObject.SetActive(true);
                 stackSizeText.text = batch.count.ToString();
             }
+            updated?.Invoke(this);
         }
 
         private void ButtonClicked()
