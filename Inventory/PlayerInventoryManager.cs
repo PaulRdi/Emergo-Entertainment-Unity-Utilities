@@ -44,7 +44,7 @@ namespace EmergoEntertainment.Inventory
         bool dirty;
 
         int currentID;
-
+        public Inventory inventory => playerInventory;
         public Inventory playerInventory;
         public RectTransform trashObject;
 

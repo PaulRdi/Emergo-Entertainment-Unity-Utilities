@@ -35,7 +35,7 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] LayerMask dragMask;
 
         bool dragging;
-
+        public IInventoryUI assignedUI { get; private set; }
 
         public int slotID
         {
@@ -65,7 +65,7 @@ namespace EmergoEntertainment.Inventory
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50.0f);
             }
             this.eventCamera = invManager.eventCamera;
-
+            this.assignedUI = invManager;
         }
 
         public void UpdateItemSlot(ItemBatch batch)
