@@ -44,6 +44,7 @@ namespace EmergoEntertainment.Inventory
 
         public void Init(IInventoryUI invManager, Canvas canvas)
         {
+            this.assignedUI = invManager;
             if (invManager.TryRegisterSlotView(this, out int id))
             {
                 slotID = id;
@@ -65,7 +66,6 @@ namespace EmergoEntertainment.Inventory
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50.0f);
             }
             this.eventCamera = invManager.eventCamera;
-            this.assignedUI = invManager;
         }
 
         public void UpdateItemSlot(ItemBatch batch)
