@@ -132,10 +132,13 @@ namespace EmergoEntertainment.Inventory
                 RaycastHit[] hits = Physics.RaycastAll(ray, float.MaxValue, dragMask);
                 RaycastHit2D[] hits2D = Physics2D.GetRayIntersectionAll(ray, float.MaxValue, dragMask);
 
-                IEnumerable<GameObject> intersectedObjects = 
+                IEnumerable<GameObject> intersectedObjects =
                     hits.Select(h => h.collider.gameObject)
-                    .Concat(
-                        hits2D.Select(h2d => h2d.collider.gameObject));
+                    .Union(
+                        hits2D.Select(h2d => h2d.collider.gameObject))
+                    .Union(
+                        res.Select(resHit => resHit.gameObject));
+                        
 
                 foreach (GameObject go in intersectedObjects)
                 {
