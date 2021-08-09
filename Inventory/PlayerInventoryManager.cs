@@ -43,7 +43,6 @@ namespace EmergoEntertainment.Inventory
         Dictionary<RecipeButton, Recipe> buttonToRecipe;
         bool dirty;
 
-        int currentID;
         public Inventory inventory => playerInventory;
         public Inventory playerInventory;
         public RectTransform trashObject;
@@ -93,20 +92,35 @@ namespace EmergoEntertainment.Inventory
             {
                 throw new UnityEngine.MissingReferenceException("Player Inventory Manager did not have canvas assigned");
             }
-            currentID = 0;
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             playerInventory.Updated += PlayerInventory_Updated;
             foreach (Recipe r in recipes)
             {
                 InstantiateRecipe(r);
             }
-            currentID = 0;
+
+
+            List<InventorySlotView> existingInventorySlots = GetComponentsInChildren<InventorySlotView>(true).ToList();
 
             for (int i= 0; i < playerInventory.slotToItemBatch.Keys.Count; i++)
             {
-                InventorySlotView slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
-                slotView.Init(this, canvas);
+
+                InventorySlotView slotView = existingInventorySlots.FirstOrDefault(invSlot => invSlot.slotID == i);
+                if (slotView == default)
+                {
+                    slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
+                }
+                else
+                {
+                    existingInventorySlots.Remove(slotView);
+                }
+                slotView.Init(this, canvas, i);
                 slotView.draggedToTrash += SlotView_DraggedToTrash;
+            }
+            foreach (InventorySlotView nonRegisteredSlot in existingInventorySlots)
+            {
+                nonRegisteredSlot.gameObject.SetActive(false);
+                nonRegisteredSlot.gameObject.name = "DISABLED " + nonRegisteredSlot.name;
             }
         }
 
@@ -176,14 +190,12 @@ namespace EmergoEntertainment.Inventory
             }
         }
 
-        public bool TryRegisterSlotView(InventorySlotView inventorySlot, out int id)
+        public bool TryRegisterSlotView(InventorySlotView inventorySlot, int id)
         {
-            id = currentID;
-            if (playerInventory.slotToItemBatch.ContainsKey(currentID) &&
-                !slotToUI.ContainsKey(currentID))
+            if (playerInventory.slotToItemBatch.ContainsKey(id) &&
+                !slotToUI.ContainsKey(id))
             {
-                slotToUI.Add(currentID, inventorySlot);
-                currentID++;
+                slotToUI.Add(id, inventorySlot);
                 return true;
             }
             return false;

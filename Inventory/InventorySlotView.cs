@@ -37,15 +37,12 @@ namespace EmergoEntertainment.Inventory
         bool dragging;
         public IInventoryUI assignedUI { get; private set; }
 
-        public int slotID
-        {
-            get; private set;
-        }
+        public int slotID;
 
-        public void Init(IInventoryUI invManager, Canvas canvas)
+        public void Init(IInventoryUI invManager, Canvas canvas, int id)
         {
             this.assignedUI = invManager;
-            if (invManager.TryRegisterSlotView(this, out int id))
+            if (invManager.TryRegisterSlotView(this, id))
             {
                 slotID = id;
             }

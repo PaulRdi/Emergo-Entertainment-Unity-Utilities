@@ -9,7 +9,7 @@ namespace EmergoEntertainment.Inventory
         /// <param name="view"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        bool TryRegisterSlotView(InventorySlotView view, out int id);
+        bool TryRegisterSlotView(InventorySlotView view, int id);
         UnityEngine.Camera eventCamera { get; }
         Inventory inventory { get; }
     }
