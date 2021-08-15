@@ -14,6 +14,7 @@ namespace EmergoEntertainment.Inventory
     {
         public static event Action<InventorySlotView> Clicked;
         public static event Action<InventorySlotView> DraggedToTrash;
+        public static event Action<InventorySlotView> DragStarted;
         /// <summary>
         /// Called when an 
         /// </summary>
@@ -24,6 +25,7 @@ namespace EmergoEntertainment.Inventory
         public event Action<InventorySlotView, GameObject> draggedToWorldSpaceObject;
         public event Action<InventorySlotView, Vector2> dragReleased;
         public event Action<InventorySlotView> draggedToTrash;
+        public static event Action<InventorySlotView> dragStarted;
         public event Action<InventorySlotView> updated;
         static GameObject dragObject;
         Camera eventCamera;
@@ -164,6 +166,8 @@ namespace EmergoEntertainment.Inventory
                 dragObject.SetActive(true);
                 dragObject.transform.position = eventData.position;
                 dragObject.GetComponent<Image>().sprite = image.sprite;
+                dragStarted?.Invoke(this);
+                DragStarted?.Invoke(this);
             }
         }
 
