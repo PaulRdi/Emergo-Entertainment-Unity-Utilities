@@ -238,6 +238,36 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
             Assert.True(inventory.CanAddItem(item3));
             yield return null;
         }
+
+        [UnityTest]
+        public IEnumerator TestResizeInventory()
+        {
+            Assert.True(inventory.ResizeInventory(2));
+            Assert.True(inventory.ResizeInventory(10));
+            Assert.True(inventory.ResizeInventory(5, false));
+            Assert.True(inventory.CanAddItem(item1));
+            Assert.True(inventory.TryAddItem(item1));
+            Assert.True(inventory.CanAddItem(item2));
+            Assert.True(inventory.TryAddItem(item2));
+            // This would destroy items and should return false;
+            Assert.False(inventory.ResizeInventory(1, false));
+            // This would destroy items and should work because it is allowed;
+            Assert.True(inventory.ResizeInventory(1));
+            Assert.False(inventory.CanAddItem(item3));
+            Assert.False(inventory.CanAddItem(item3));
+            Assert.True(inventory.ResizeInventory(2));
+            Assert.True(inventory.CanAddItem(item3));
+            Assert.True(inventory.CanAddItem(item3));
+            Assert.True(inventory.TryTakeItems(item1, out List<IItemInstance> taken));
+            Assert.True(inventory.ResizeInventory(1, false));
+
+
+
+
+            yield return null;
+
+        }
+
         [SetUp]
         public void SetUp()
         {

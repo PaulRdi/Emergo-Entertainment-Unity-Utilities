@@ -331,5 +331,55 @@ namespace EmergoEntertainment.Inventory
             UpdateEmptyBatches();
             return items;
         }
+
+        /// <summary>
+        /// Set the inventory size to the new size.
+        /// </summary>
+        /// <param name="newSize"></param>
+        /// <param name="acceptLossOfItems">True: the reduction continues even when items will be destroyed;
+        /// False: the reduction will not start if items would be destroyed.</param>
+        /// <returns></returns>
+        public bool ResizeInventory (int newSize, bool acceptLossOfItems = true)
+		{
+            if (slotToItemBatch.Count == newSize)
+            {
+            }
+            else if (slotToItemBatch.Count < newSize)
+            {
+                int slotsToCreate = newSize - slotToItemBatch.Count;
+                int highestIndex = -1;
+                if (slotToItemBatch.Count > 0)
+                    highestIndex = slotToItemBatch.Keys.ToList().OrderByDescending(i => i).ToList()[0];
+                for (int i = 0; i < slotsToCreate; i++)
+                {
+                    slotToItemBatch.Add(highestIndex + i + 1, null);
+                }
+
+            }
+            else if (slotToItemBatch.Count > newSize)
+            {
+                var emptySlots = slotToItemBatch.Keys.Where(slot => slotToItemBatch[slot] == null || slotToItemBatch[slot].count == 0).ToList();
+                int slotsToRemove = slotToItemBatch.Count - newSize;
+                if (emptySlots.Count() < slotsToRemove && !acceptLossOfItems)
+                {
+                    return false;
+                }
+                for (int i = 0; i < slotsToRemove; i++)
+                {
+                    if (emptySlots.Count() > 0)
+                    {
+                        slotToItemBatch.Remove(emptySlots[0]);
+                        emptySlots.RemoveAt(0);
+                    }
+                    else
+                    {
+                        slotToItemBatch.Remove(slotToItemBatch.Last().Key);
+                    }
+                }
+            }
+
+            Updated?.Invoke();
+            return true;
+		}
     }
 }
