@@ -120,7 +120,7 @@ namespace EmergoEntertainment.Inventory
             foreach (InventorySlotView nonRegisteredSlot in existingInventorySlots)
             {
                 nonRegisteredSlot.gameObject.SetActive(false);
-                nonRegisteredSlot.gameObject.name = "DISABLED " + nonRegisteredSlot.name;
+                //nonRegisteredSlot.gameObject.name = "DISABLED " + nonRegisteredSlot.name;
             }
         }
 
@@ -204,9 +204,26 @@ namespace EmergoEntertainment.Inventory
 
         public void UpdateUI()
         {
+            List<InventorySlotView> existingInventorySlots = GetComponentsInChildren<InventorySlotView>(true).ToList();
             foreach (int slotID in playerInventory.slotToItemBatch.Keys)
             {
-                slotToUI[slotID].UpdateItemSlot(playerInventory.slotToItemBatch[slotID]);
+                if (slotToUI.ContainsKey(slotID))
+                    slotToUI[slotID].UpdateItemSlot(playerInventory.slotToItemBatch[slotID]);
+                else
+                {
+                    InventorySlotView slotView = existingInventorySlots.FirstOrDefault(invSlot => invSlot.slotID == slotID);
+                    if (slotView == default)
+                    {
+                        slotView = Instantiate(inventorySlotPrefab, inventorySlotParent);
+                    }
+                    else
+                    {
+                        existingInventorySlots.Remove(slotView);
+                    }
+                    slotView.Init(this, canvas, slotID);
+                    slotView.draggedToTrash += SlotView_DraggedToTrash;
+                    slotView.gameObject.SetActive(true);
+                }
             }
         }
     }
