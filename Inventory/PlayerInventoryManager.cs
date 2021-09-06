@@ -201,7 +201,9 @@ namespace EmergoEntertainment.Inventory
             return false;
         }
 
-
+        /// <summary>
+        /// CAUTION: Dosent work when the inventory is reduced and increased twice
+        /// </summary>
         public void UpdateUI()
         {
             List<InventorySlotView> existingInventorySlots = GetComponentsInChildren<InventorySlotView>(true).ToList();
@@ -224,6 +226,23 @@ namespace EmergoEntertainment.Inventory
                     slotView.draggedToTrash += SlotView_DraggedToTrash;
                     slotView.gameObject.SetActive(true);
                 }
+            }
+
+
+            // Find and deactivate all slot prefabs without an active slot id
+            List<InventorySlotView> activeInventorySlotsviews = GetComponentsInChildren<InventorySlotView>(false).ToList();
+            slotToUI = slotToUI.Where(slot => playerInventory.slotToItemBatch.ContainsKey(slot.Key)).ToDictionary(slot => slot.Key, slot => slot.Value);
+
+            foreach (var slotView in activeInventorySlotsviews)
+            {
+                if (slotToUI.ContainsValue(slotView))
+                {
+                    slotView.gameObject.SetActive(true);
+                    slotView.transform.SetAsFirstSibling();
+                }
+                else
+                    slotView.gameObject.SetActive(false);
+
             }
         }
     }
