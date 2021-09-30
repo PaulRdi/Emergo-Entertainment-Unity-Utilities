@@ -33,7 +33,12 @@ namespace EmergoEntertainment.Inventory
                 return count * item.stackWeight;
             }
         }
-        private bool CanAddItemInstance(IItemInstance itemInstance)
+        /// <summary>
+        /// Make sure only items of the same data get added to a slot and the same item instance doesnt get added twice.
+        /// </summary>
+        /// <param name="itemInstance"></param>
+        /// <returns></returns>
+        private bool ValidateItemInstance(IItemInstance itemInstance)
         {
             if (item != itemInstance.data)
                 return false;
@@ -58,7 +63,7 @@ namespace EmergoEntertainment.Inventory
         }
         public bool TryAdd(IItemInstance itemInstance)
         {
-            if (CanAddItemInstance(itemInstance))
+            if (ValidateItemInstance(itemInstance))
             {
                 items.Add(itemInstance);
                 return true;

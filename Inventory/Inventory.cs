@@ -10,6 +10,7 @@ namespace EmergoEntertainment.Inventory
     {
         public event Action Updated;
         public event Action<IItemInstance> ItemAdded;
+        public event Action<List<IItemInstance>> ItemsAdded;
 
         public Dictionary<Item, List<ItemBatch>> itemToItemBatch;
         public List<ItemBatch> itemBatches;
@@ -145,6 +146,59 @@ namespace EmergoEntertainment.Inventory
                 return true;
             }
         }
+
+        public bool TryAddItems(Item item, int amount)
+        {
+            if (amount < 1)
+                return false;
+
+            var slots = slotToItemBatch.Where(s => s.Value == null || s.Value.item == item).ToArray();
+            if (slots.Length <= 0)
+                return false;
+
+            float totalWeight = item.stackWeight * amount;
+            //If the total weight is greater than the space we have we cant add the items.
+           
+            if (totalWeight > slots.Sum(kvp => kvp.Value != null ? maxBatchSize-kvp.Value.fillLevel : maxBatchSize))
+                return false;
+
+            
+            List<IItemInstance> addedItemInstances = new List<IItemInstance>();
+              
+            int addedItems = 0;
+            //at this point we know there is enough space in the inventory to add all items.
+            for (int i =0; i < slots.Length; i++)
+            {
+                var kvp = slots[i];
+                //while there is space in a given item batch, add items to this item batch
+                //Then proceed with the next batch.
+                while (
+                    kvp.Value == default ||
+                    kvp.Value.fillLevel < maxBatchSize)
+                {
+                    IItemInstance addedInstance = default;
+                    if (kvp.Value == null)
+                    {
+                        addedInstance = ItemManager.CreateItemInstance(item, null);
+                        CreateNewItemBatch(item, addedInstance, kvp.Key);
+                    }
+                    else
+                    {
+                        addedInstance = kvp.Value.AddNew(1)[0];
+                    }
+                    addedItemInstances.Add(addedInstance);
+                    ++addedItems;
+                    if (addedItems >= amount)
+                        break;
+                }
+                if (addedItems >= amount)
+                    break;
+            }
+            ItemsAdded?.Invoke(addedItemInstances);
+            ItemAdded?.Invoke(addedItemInstances[0]);
+            UpdateEmptyBatches();
+            return true;
+        }
         public bool TryAddItem(Item item)
         {
             ItemBatch queriedBatch = itemBatches.FirstOrDefault(
@@ -185,15 +239,14 @@ namespace EmergoEntertainment.Inventory
             }
             else
             {
-                if (slotId < 0)
                 slotToItemBatch[slotId] = batch;
             }
-            AddBatch(item, batch);
+            AddItemToBatchMapping(item, batch);
             UpdateEmptyBatches();
             return batch;
         }
 
-        private void AddBatch(Item item, ItemBatch batch)
+        private void AddItemToBatchMapping(Item item, ItemBatch batch)
         {
             if (!itemToItemBatch.ContainsKey(item))
             {

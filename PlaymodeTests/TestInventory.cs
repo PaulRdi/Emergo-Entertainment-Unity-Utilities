@@ -147,6 +147,20 @@ namespace EmergoEntertainment.UnityUtilityPlaymodetests
         }
 
         [UnityTest]
+        public IEnumerator TestAddItems()
+        {
+            Assert.True(inventory.TryAddItems(item1, 3));
+            Assert.True(inventory.HasItem(item1, 3));
+            Assert.False(inventory.HasItem(item1, 4));
+
+            Assert.False(inventory.TryAddItems(item1, 3000));
+            Assert.True(inventory.HasItem(item1, 3));
+            Assert.False(inventory.HasItem(item1, 4));
+
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator TestQuery()
         {
             HashSet<IItemInstance> result;
