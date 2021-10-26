@@ -24,7 +24,6 @@ namespace EmergoEntertainment.Inventory
         public event Action<InventorySlotView> clicked;
         public event Action<InventorySlotView, GameObject> draggedToWorldSpaceObject;
         public event Action<InventorySlotView, Vector2> dragReleased;
-        public event Action<InventorySlotView> draggedToTrash;
         public static event Action<InventorySlotView> dragStarted;
         public event Action<InventorySlotView> updated;
         static GameObject dragObject;
@@ -118,15 +117,6 @@ namespace EmergoEntertainment.Inventory
 
             dragReleased?.Invoke(this, eventData.position);
             DragReleased?.Invoke(this, eventData.position);
-
-            if (PlayerInventoryManager.instance != null &&
-                PlayerInventoryManager.instance.trashObject != null &&
-                res.Any(r => r.gameObject == PlayerInventoryManager.instance.trashObject.gameObject))
-            {
-                draggedToTrash?.Invoke(this);
-                DraggedToTrash?.Invoke(this);
-            }
-
 
             if (eventCamera != null)
             {

@@ -10,11 +10,6 @@ namespace EmergoEntertainment.Inventory
 {
     public class PlayerInventoryManager : MonoBehaviour, IInventoryUI
     {
-        /// <summary>
-        /// The slot id from the player inventory and the associated items which were dragged to the trash object.
-        /// </summary>
-        public event Action<InventorySlotView, List<IItemInstance>> itemsDraggedToTrash;
-
         public static PlayerInventoryManager instance
         {
             get
@@ -45,7 +40,6 @@ namespace EmergoEntertainment.Inventory
 
         public Inventory inventory => playerInventory;
         public Inventory playerInventory;
-        public RectTransform trashObject;
 
         public void Awake()
         {
@@ -115,23 +109,12 @@ namespace EmergoEntertainment.Inventory
                     existingInventorySlots.Remove(slotView);
                 }
                 slotView.Init(this, canvas, i);
-                slotView.draggedToTrash += SlotView_DraggedToTrash;
             }
             foreach (InventorySlotView nonRegisteredSlot in existingInventorySlots)
             {
                 nonRegisteredSlot.gameObject.SetActive(false);
                 //nonRegisteredSlot.gameObject.name = "DISABLED " + nonRegisteredSlot.name;
             }
-        }
-
-        private void SlotView_DraggedToTrash(InventorySlotView obj)
-        {
-            if (playerInventory.TryTakeItemFromSlot(obj.slotID, out List<IItemInstance> items))
-            {
-                itemsDraggedToTrash?.Invoke(obj, items);
-                return;
-            }
-            itemsDraggedToTrash?.Invoke(obj, new List<IItemInstance>());
         }
 
         private void PlayerInventory_Updated()
@@ -223,7 +206,6 @@ namespace EmergoEntertainment.Inventory
                         existingInventorySlots.Remove(slotView);
                     }
                     slotView.Init(this, canvas, slotID);
-                    slotView.draggedToTrash += SlotView_DraggedToTrash;
                     slotView.gameObject.SetActive(true);
                 }
             }
