@@ -21,6 +21,8 @@ namespace EmergoEntertainment.Inventory
         public static event Action<InventorySlotView, GameObject> DraggedToWorldSpaceObject;
         public static event Action<InventorySlotView, Vector2> DragReleased;
 
+        public static event Func<InventorySlotView ,Camera> eventCameraRequested;
+
         public event Action<InventorySlotView> clicked;
         public event Action<InventorySlotView, GameObject> draggedToWorldSpaceObject;
         public event Action<InventorySlotView, Vector2> dragReleased;
@@ -105,7 +107,14 @@ namespace EmergoEntertainment.Inventory
         {
             this.eventCamera = eventCamera;
         }
-
+        void GetEventCamera()
+        {
+            if (eventCamera == default &&
+                eventCameraRequested != default)
+            {
+                eventCamera = eventCameraRequested.Invoke(this);
+            }
+        }
         public void OnPointerUp(PointerEventData eventData)
         {
             if (!dragging)
@@ -117,6 +126,8 @@ namespace EmergoEntertainment.Inventory
 
             dragReleased?.Invoke(this, eventData.position);
             DragReleased?.Invoke(this, eventData.position);
+
+            GetEventCamera();
 
             if (eventCamera != null)
             {
