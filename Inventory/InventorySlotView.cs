@@ -167,6 +167,7 @@ namespace EmergoEntertainment.Inventory
                 dragObject.SetActive(true);
                 dragObject.transform.position = eventData.position;
                 dragObject.GetComponent<Image>().sprite = image.sprite;
+                dragObject.GetComponent<Image>().color = image.color;
                 dragStarted?.Invoke(this);
                 DragStarted?.Invoke(this);
             }
