@@ -30,6 +30,17 @@ namespace EmergoEntertainment.Inventory
         public string Description { get => description; }
         [SerializeField] [TextArea] string description;
 
+        public static Item Create(string name, GameObject prefab, bool consumeOnUse, float stackWeight, Sprite icon)
+        {
+            Item inst = ScriptableObject.CreateInstance<Item>();
+            inst._consumeOnUse = consumeOnUse;
+            inst._stackWeight = stackWeight;
+            inst.icon = icon;
+            inst._prefab = prefab;
+            inst.name = name;
+            return inst;
+        }
+
 
     }
 }

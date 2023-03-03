@@ -116,7 +116,7 @@ namespace EmergoEntertainment.Inventory
 
         public bool CanAddItem(Item item)
         {
-            ItemBatch queriedBatch = itemBatches.FirstOrDefault(b => b.item == item && b.count+item.stackWeight <= maxBatchSize);
+            ItemBatch queriedBatch = itemBatches.FirstOrDefault(b => b.item == item && b.fillLevel+item.stackWeight <= maxBatchSize);
             return queriedBatch != default(ItemBatch) || slotToItemBatch.Any(s => s.Value == null);
         }
         public bool TryAddItemInstance(IItemInstance itemInstance)
