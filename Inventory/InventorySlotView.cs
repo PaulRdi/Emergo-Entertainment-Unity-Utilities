@@ -31,6 +31,7 @@ namespace EmergoEntertainment.Inventory
         static GameObject dragObject;
         Camera eventCamera;
         [SerializeField] TextMeshProUGUI stackSizeText;
+        [SerializeField] GameObject stackSizeTextParent;
         [SerializeField] Image image;
         /// <summary>
         /// Defines which layers are targeted to trigger the DraggedToObject event.
@@ -73,7 +74,7 @@ namespace EmergoEntertainment.Inventory
             if (batch == null)
             {
                 image.sprite = null;
-                stackSizeText.gameObject.SetActive(false);
+                stackSizeTextParent.gameObject.SetActive(false);
                 image.color = new Color(1, 1, 1, 0);
 
             }
@@ -81,7 +82,7 @@ namespace EmergoEntertainment.Inventory
             {
                 image.sprite = batch.item.Icon;
                 image.color = new Color(1, 1, 1, 1);
-                stackSizeText.gameObject.SetActive(true);
+                stackSizeTextParent.gameObject.SetActive(true);
                 stackSizeText.text = batch.count.ToString();
             }
             updated?.Invoke(this);
