@@ -235,7 +235,7 @@ namespace EmergoEntertainment.Inventory
                 if (slotToUI.ContainsValue(slotView))
                 {
                     slotView.gameObject.SetActive(true);
-                    slotView.transform.SetAsFirstSibling();
+                    //slotView.transform.SetAsFirstSibling();
                 }
                 else
                     slotView.gameObject.SetActive(false);
