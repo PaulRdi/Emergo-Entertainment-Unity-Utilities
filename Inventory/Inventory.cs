@@ -226,6 +226,33 @@ namespace EmergoEntertainment.Inventory
             }
         }
 
+        public bool TryAddItem(Item item, out IItemInstance itemInstance)
+        {
+            ItemBatch queriedBatch = itemBatches.FirstOrDefault(
+                b =>
+                b.item == item &&
+                b.fillLevel <= maxBatchSize - item.stackWeight);
+            itemInstance = default;
+            if (queriedBatch != default(ItemBatch))
+            {
+                itemInstance = queriedBatch.AddNew(1)[0];
+                ItemAdded?.Invoke(itemInstance);
+                return true;
+            }
+            else
+            {
+                if (!slotToItemBatch.Any(s => s.Value == null))
+                {
+                    return false;
+                }
+                itemInstance = ItemManager.CreateItemInstance(item, null);
+                CreateNewItemBatch(item, itemInstance);
+                UpdateEmptyBatches();
+                ItemAdded?.Invoke(itemInstance);
+                return true;
+            }
+        }
+
         private ItemBatch CreateNewItemBatch(Item item, IItemInstance itemInstance, int slotId = -1)
         {
             if (slotToItemBatch.All(s => s.Value != null && s.Value.item != default))
