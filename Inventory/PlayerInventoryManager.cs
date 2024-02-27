@@ -41,6 +41,8 @@ namespace EmergoEntertainment.Inventory
         public Inventory inventory => playerInventory;
         public Inventory playerInventory;
 
+        public static event Action inventorySetupFinished;
+
         public void Awake()
         {
             if (initOnAwake)
@@ -56,8 +58,8 @@ namespace EmergoEntertainment.Inventory
                     inventory = new Inventory(1, 1);
                     Debug.LogWarning("Did not provide an inventory on init. Initializing new inventory.");
                 }
-                
-                InitInventory(inventory);             
+
+                InitInventory(inventory);
                 DontDestroyOnLoad(this.gameObject);
             }
             else
@@ -81,6 +83,8 @@ namespace EmergoEntertainment.Inventory
             playerInventory = inventory;
             buttonToRecipe = new Dictionary<RecipeButton, Recipe>();
             slotToUI = new Dictionary<int, InventorySlotView>();
+            TrySetEventCamera();
+
             if (this.canvas == null)
 
             {
@@ -96,7 +100,7 @@ namespace EmergoEntertainment.Inventory
 
             List<InventorySlotView> existingInventorySlots = GetComponentsInChildren<InventorySlotView>(true).ToList();
 
-            for (int i= 0; i < playerInventory.slotToItemBatch.Keys.Count; i++)
+            for (int i = 0; i < playerInventory.slotToItemBatch.Keys.Count; i++)
             {
 
                 InventorySlotView slotView = existingInventorySlots.FirstOrDefault(invSlot => invSlot.slotID == i);
@@ -115,6 +119,8 @@ namespace EmergoEntertainment.Inventory
                 nonRegisteredSlot.gameObject.SetActive(false);
                 //nonRegisteredSlot.gameObject.name = "DISABLED " + nonRegisteredSlot.name;
             }
+
+            inventorySetupFinished.Invoke();
         }
 
         private void PlayerInventory_Updated()
@@ -122,16 +128,25 @@ namespace EmergoEntertainment.Inventory
             UpdateUI();
         }
 
-        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+        private void TrySetEventCamera()
         {
-            PhysicsRaycaster raycaster = FindObjectOfType<PhysicsRaycaster>();
-            if (raycaster == null)
+            PhysicsRaycaster raycaster3D = FindObjectOfType<PhysicsRaycaster>();
+            Physics2DRaycaster raycaster2D = FindObjectOfType<Physics2DRaycaster>();
+
+            if (raycaster3D == null && raycaster2D == null)
                 Debug.LogError("There was no physics raycaster in the scene you loaded. Inventory Pointer callbacks may not work as intended.");
             else
             {
-                eventCamera = raycaster.GetComponent<Camera>();
-                
+                if (raycaster2D != null)
+                    eventCamera = raycaster2D.GetComponent<Camera>();
+                else
+                    eventCamera = raycaster3D.GetComponent<Camera>();
             }
+        }
+
+        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            TrySetEventCamera();
             foreach (InventorySlotView slotView in slotToUI.Values)
             {
                 slotView.SetEventCamera(eventCamera);
