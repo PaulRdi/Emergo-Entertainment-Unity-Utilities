@@ -298,6 +298,20 @@ namespace EmergoEntertainment.Inventory
             return true;
         }
 
+        public bool SlotContainsItem(int slotID, Item item, out int amount)
+        {
+            amount = 0;
+            if (!slotToItemBatch.ContainsKey(slotID) ||
+                slotToItemBatch[slotID] == null)
+                return false;
+            if (slotToItemBatch[slotID].item == item)
+            {
+                amount = slotToItemBatch[slotID].count;
+                return true;
+            }
+            return false;
+        }
+
         public bool TryAddItemInstanceToSlot(int slotID, IItemInstance itemInstance)
         {
             if (!slotToItemBatch.ContainsKey(slotID))
