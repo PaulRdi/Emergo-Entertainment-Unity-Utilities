@@ -50,6 +50,8 @@ namespace EmergoEntertainment.Inventory
             this.assignedUI = invManager;
             this.canvas = canvas;
             canvasRectTransform = canvas.GetComponent<RectTransform>();
+  
+
             if (invManager.TryRegisterSlotView(this, id))
             {
                 slotID = id;
@@ -69,6 +71,9 @@ namespace EmergoEntertainment.Inventory
                 dragObject.GetComponent<Image>().raycastTarget = false;
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50.0f);
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50.0f);
+
+                if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
+                    dragObject.transform.localScale = canvasRectTransform.localScale;
             }
             this.eventCamera = invManager.eventCamera;
         }
@@ -104,14 +109,19 @@ namespace EmergoEntertainment.Inventory
             {
                 return;
             }
-
-            Camera camera = canvas.worldCamera; 
-
-            Vector3 worldPosition;
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRectTransform, eventData.position, camera, out worldPosition))
+            if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
             {
-                dragObject.transform.position = worldPosition;
-                dragObject.transform.localPosition = new Vector3(dragObject.transform.localPosition.x, dragObject.transform.localPosition.y, 0);
+                dragObject.transform.position = eventData.position;
+            }
+            else if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
+            {
+                Camera camera = canvas.worldCamera;
+                Vector3 worldPosition;
+                if (RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRectTransform, eventData.position, camera, out worldPosition))
+                {
+                    dragObject.transform.position = worldPosition;
+                    dragObject.transform.localPosition = new Vector3(dragObject.transform.localPosition.x, dragObject.transform.localPosition.y, 0);
+                }
             }
         }
 
