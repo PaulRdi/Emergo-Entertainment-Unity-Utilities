@@ -44,6 +44,7 @@ namespace EmergoEntertainment.Inventory
         public IInventoryUI assignedUI { get; private set; }
 
         public int slotID;
+        public float dragObjectScale = 1.0f;
 
         public void Init(IInventoryUI invManager, Canvas canvas, int id)
         {
@@ -69,11 +70,8 @@ namespace EmergoEntertainment.Inventory
                 dragObject.transform.SetParent(canvas.transform);
                 dragObject.SetActive(false);
                 dragObject.GetComponent<Image>().raycastTarget = false;
-                dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50.0f);
-                dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50.0f);
-
-                if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
-                    dragObject.transform.localScale = canvasRectTransform.localScale;
+                dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50.0f * dragObjectScale);
+                dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50.0f * dragObjectScale);
             }
             this.eventCamera = invManager.eventCamera;
         }
