@@ -15,7 +15,7 @@ namespace EmergoEntertainment.Inventory
         public Dictionary<Item, List<ItemBatch>> itemToItemBatch;
         public List<ItemBatch> itemBatches;
         public Dictionary<int, ItemBatch> slotToItemBatch;
-        public int maxBatchSize { get; private set; }      
+        public int maxBatchSize { get; private set; }
 
         public Inventory(int maxBatchSize, int numSlots)
         {

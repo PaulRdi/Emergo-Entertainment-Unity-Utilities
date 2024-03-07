@@ -39,6 +39,8 @@ namespace EmergoEntertainment.Inventory
         [SerializeField] LayerMask dragMask;
 
         bool dragging;
+        private Canvas canvas;
+        private RectTransform canvasRectTransform;
         public IInventoryUI assignedUI { get; private set; }
 
         public int slotID;
@@ -46,6 +48,8 @@ namespace EmergoEntertainment.Inventory
         public void Init(IInventoryUI invManager, Canvas canvas, int id)
         {
             this.assignedUI = invManager;
+            this.canvas = canvas;
+            canvasRectTransform = canvas.GetComponent<RectTransform>();
             if (invManager.TryRegisterSlotView(this, id))
             {
                 slotID = id;
@@ -100,8 +104,15 @@ namespace EmergoEntertainment.Inventory
             {
                 return;
             }
-            dragObject.transform.position = eventData.position;
 
+            Camera camera = canvas.worldCamera; 
+
+            Vector3 worldPosition;
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRectTransform, eventData.position, camera, out worldPosition))
+            {
+                dragObject.transform.position = worldPosition;
+                dragObject.transform.localPosition = new Vector3(dragObject.transform.localPosition.x, dragObject.transform.localPosition.y, 0);
+            }
         }
 
         internal void SetEventCamera(Camera eventCamera)
