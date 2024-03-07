@@ -72,6 +72,9 @@ namespace EmergoEntertainment.Inventory
                 dragObject.GetComponent<Image>().raycastTarget = false;
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50.0f * dragObjectScale);
                 dragObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50.0f * dragObjectScale);
+
+                if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
+                    dragObject.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             }
             this.eventCamera = invManager.eventCamera;
         }
