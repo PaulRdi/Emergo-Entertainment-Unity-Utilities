@@ -45,6 +45,7 @@ namespace EmergoEntertainment.Inventory
             dragObject.style.width = dragObjectSize;
             dragObject.style.height = dragObjectSize;
             dragObject.AddToClassList("DragObject");
+            dragObject.pickingMode = PickingMode.Ignore;
             root.Add(dragObject);
 
             dragObject.style.display = DisplayStyle.None;
