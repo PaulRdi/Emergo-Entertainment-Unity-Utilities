@@ -29,6 +29,7 @@ namespace EmergoEntertainment.Inventory
 
         [Header("Settings")]
         [SerializeField] private float dragObjectSize = 100;
+        [SerializeField] private bool autoDragOffset = true;
 
         private void Start()
         {
@@ -76,8 +77,11 @@ namespace EmergoEntertainment.Inventory
 
             Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, mousePosition);
 
-            dragObject.style.left = localMousePosition.x;
-            dragObject.style.top = localMousePosition.y;
+            float xOffset = autoDragOffset ? dragObject.layout.width / 2 : 0;
+            float yOffset = autoDragOffset ? dragObject.layout.height / 2 : 0;
+
+            dragObject.style.left = localMousePosition.x + xOffset;
+            dragObject.style.top = localMousePosition.y + yOffset;
         }
 
         private void StartDrag(UIToolkitInventorySlot slot)
