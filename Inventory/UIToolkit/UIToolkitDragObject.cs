@@ -32,7 +32,7 @@ namespace EmergoEntertainment.Inventory
 
         private void Start()
         {
-            inventoryManager = UIToolkitPlayerInventoryManager.instance;
+            inventoryManager = FindFirstObjectByType<UIToolkitPlayerInventoryManager>();
 
             CreateDragObject();
         }
