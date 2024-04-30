@@ -90,6 +90,7 @@ namespace EmergoEntertainment.Inventory
             root = GetComponent<UIDocument>().rootVisualElement;
 
             inventoryHolder = new VisualElement();
+            inventoryHolder.name = "Inventory";
             inventoryHolder.AddToClassList("Inventory");
             inventoryHolder.style.width = slotsPerRow * (cellSize + (2 * spacing));
             inventoryHolder.style.height = Mathf.Ceil((float)inventory.numSlots / (float)slotsPerRow) * (cellSize + (2 * spacing));
@@ -111,6 +112,8 @@ namespace EmergoEntertainment.Inventory
         {
             var button = new Button();
             button.AddToClassList("InventorySlot");
+            button.name = "InventorySlot_" + index;
+
             button.style.width = cellSize;
             button.style.height = cellSize;
             button.style.marginLeft = spacing;

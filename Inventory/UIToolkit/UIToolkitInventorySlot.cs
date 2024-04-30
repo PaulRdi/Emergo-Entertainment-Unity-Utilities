@@ -40,6 +40,7 @@ public class UIToolkitInventorySlot
         button.RegisterCallback<PointerOutEvent>(OnPointerOut);
 
         stackText = new Label();
+        stackText.name = "StackText";
         stackText.AddToClassList("SlotAmountText");
         stackText.text = "";
         stackText.pickingMode = PickingMode.Ignore;
