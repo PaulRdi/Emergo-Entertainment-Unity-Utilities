@@ -240,6 +240,7 @@ namespace EmergoEntertainment.Inventory
             if (queriedBatch != default(ItemBatch))
             {
                 itemInstance = queriedBatch.AddNew(1)[0];
+                UpdateEmptyBatches();
                 ItemAdded?.Invoke(itemInstance);
                 return true;
             }
