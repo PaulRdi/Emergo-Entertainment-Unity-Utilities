@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UIElements;
 namespace EmergoEntertainment.Inventory
 {
     public class Inventory
@@ -16,6 +17,8 @@ namespace EmergoEntertainment.Inventory
         public List<ItemBatch> itemBatches;
         public Dictionary<int, ItemBatch> slotToItemBatch;
         public int maxBatchSize { get; private set; }
+
+        public int numSlots => slotToItemBatch.Count;
 
         public Inventory(int maxBatchSize, int numSlots)
         {
@@ -209,6 +212,7 @@ namespace EmergoEntertainment.Inventory
             if (queriedBatch != default(ItemBatch))
             {
                 itemInstance = queriedBatch.AddNew(1)[0];
+                UpdateEmptyBatches();
                 ItemAdded?.Invoke(itemInstance);
                 return true;
             }
@@ -284,7 +288,7 @@ namespace EmergoEntertainment.Inventory
         }
 
 
-       public bool TryTakeItemFromSlot(int slotID, out List<IItemInstance> items)
+        public bool TryTakeItemFromSlot(int slotID, out List<IItemInstance> items)
         {
             items = new List<IItemInstance>();
             if (!slotToItemBatch.ContainsKey(slotID) ||
@@ -297,6 +301,7 @@ namespace EmergoEntertainment.Inventory
             UpdateEmptyBatches();
             return true;
         }
+
 
         public bool SlotContainsItem(int slotID, Item item, out int amount)
         {

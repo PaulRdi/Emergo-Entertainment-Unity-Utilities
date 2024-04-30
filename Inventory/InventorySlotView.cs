@@ -6,25 +6,31 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using TMPro;
-using UnityEngine.SceneManagement;
 
+
+/*
+ * Möglichkeit Inventory Slot an ItemBatch zu binden
+ * -> Entsprechende Updates bei Änderungen des Inventars
+ * Drag / Drop Handling
+ * */
 namespace EmergoEntertainment.Inventory
 {
     public class InventorySlotView : MonoBehaviour, IPointerClickHandler, IDragHandler, IDropHandler, IPointerUpHandler, IPointerDownHandler
     {
         public static event Action<InventorySlotView> Clicked;
+        public event Action<InventorySlotView> clicked;
         public static event Action<InventorySlotView> DraggedToTrash;
         public static event Action<InventorySlotView> DragStarted;
         /// <summary>
         /// Called when an 
         /// </summary>
         public static event Action<InventorySlotView, GameObject> DraggedToWorldSpaceObject;
+        public event Action<InventorySlotView, GameObject> draggedToWorldSpaceObject;
+
         public static event Action<InventorySlotView, Vector2> DragReleased;
 
         public static event Func<InventorySlotView ,Camera> eventCameraRequested;
 
-        public event Action<InventorySlotView> clicked;
-        public event Action<InventorySlotView, GameObject> draggedToWorldSpaceObject;
         public event Action<InventorySlotView, Vector2> dragReleased;
         public static event Action<InventorySlotView> dragStarted;
         public event Action<InventorySlotView> updated;
@@ -198,6 +204,7 @@ namespace EmergoEntertainment.Inventory
 
         public void OnDrop(PointerEventData eventData)
         {
+
         }
 
         public void OnPointerClick(PointerEventData eventData)

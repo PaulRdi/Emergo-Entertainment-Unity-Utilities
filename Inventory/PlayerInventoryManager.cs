@@ -36,11 +36,13 @@ namespace EmergoEntertainment.Inventory
 
         public Dictionary<int, InventorySlotView> slotToUI;
         Dictionary<RecipeButton, Recipe> buttonToRecipe;
+        
         bool dirty;
 
         public Inventory inventory => playerInventory;
         public Inventory playerInventory;
 
+        //Not used withing the package
         public static event Action inventorySetupFinished;
 
         public void Awake()
