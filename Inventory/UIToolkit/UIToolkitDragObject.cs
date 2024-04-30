@@ -77,11 +77,10 @@ namespace EmergoEntertainment.Inventory
 
             Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, mousePosition);
 
-            float xOffset = autoDragOffset ? dragObject.layout.width / 2 : 0;
-            float yOffset = autoDragOffset ? dragObject.layout.height / 2 : 0;
+            float offset = autoDragOffset ? dragObjectSize / 2 : 0;
 
-            dragObject.style.left = localMousePosition.x + xOffset;
-            dragObject.style.top = localMousePosition.y + yOffset;
+            dragObject.style.left = localMousePosition.x - offset;
+            dragObject.style.top = localMousePosition.y - offset;
         }
 
         private void StartDrag(UIToolkitInventorySlot slot)
