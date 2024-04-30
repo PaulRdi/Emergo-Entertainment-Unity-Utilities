@@ -41,7 +41,7 @@ public class UIToolkitInventorySlot
 
         stackText = new Label();
         stackText.AddToClassList("SlotAmountText");
-        stackText.text = "1";
+        stackText.text = "";
         stackText.pickingMode = PickingMode.Ignore;
         stackText.style.display = DisplayStyle.None;
         button.Add(stackText);
@@ -67,7 +67,6 @@ public class UIToolkitInventorySlot
             button.style.backgroundImage = new StyleBackground(batch.item.Icon);
             stackText.style.display = DisplayStyle.Flex;
             stackText.text = batch.count.ToString();
-            Debug.Log(stackText.text);
         }
         updated?.Invoke(this);
     }

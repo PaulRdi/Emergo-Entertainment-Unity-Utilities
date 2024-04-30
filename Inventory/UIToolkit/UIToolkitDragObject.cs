@@ -133,7 +133,6 @@ namespace EmergoEntertainment.Inventory
             if (hoveringSlot == null || hoveringSlot == slot)
                 return;
 
-            Debug.Log("Checking for inventory slot drag");
             hoveringSlot.TryMoveItemFromOtherInventorySlotToThis(slot);
         }
     }
