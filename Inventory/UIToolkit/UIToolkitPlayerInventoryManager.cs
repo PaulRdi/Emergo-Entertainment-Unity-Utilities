@@ -105,6 +105,7 @@ namespace EmergoEntertainment.Inventory
                 inventoryHolder.Add(slot);
             }
 
+            inventoryHolder.style.display = DisplayStyle.None;
             playerInventory.Updated += UpdateUI;
         }
 
