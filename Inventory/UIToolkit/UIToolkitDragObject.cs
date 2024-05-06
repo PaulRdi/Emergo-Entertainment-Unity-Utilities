@@ -98,12 +98,12 @@ namespace EmergoEntertainment.Inventory
 
         private void StopDrag(UIToolkitInventorySlot slot)
         {
+            dragObject.style.display = DisplayStyle.None;
             var batch = inventory.slotToItemBatch[slot.slotID];
             if (batch == null || batch.item == null || !dragging)
                 return;
 
             dragging = false;
-            dragObject.style.display = DisplayStyle.None;
 
             CheckForWorldSpaceDrag(slot);
             CheckForInventorySlotDrag(slot);
