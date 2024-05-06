@@ -1,6 +1,8 @@
 using EmergoEntertainment.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,11 +23,13 @@ public class UIToolkitInventorySlot
 
     private Label stackText;
     private Button button;
+    private bool dragging = false;
 
     public int slotID;
 
     public ItemBatch itemBatch => _itemBatch;
     private ItemBatch _itemBatch => inventoryManager.inventory.slotToItemBatch[slotID];
+    
 
     public void INIT(Button button, IUIToolkitInventoryUI inventoryManager, int slotID)
     {
@@ -78,11 +82,12 @@ public class UIToolkitInventorySlot
             return;
 
         OnDragStart?.Invoke(this);
+        dragging = true;
     }
 
-    private void OnPointerUp(PointerUpEvent evt)
+    private void OnPointerUp(PointerUpEvent eventData)
     {
-        if (_itemBatch == null || _itemBatch.item == null)
+        if (_itemBatch == null || _itemBatch.item == null || !dragging)
             return;
 
         OnDragEnd?.Invoke(this);
