@@ -26,7 +26,6 @@ public class UIToolkitInventorySlot
 
     public ItemBatch itemBatch => _itemBatch;
     private ItemBatch _itemBatch => inventoryManager.inventory.slotToItemBatch[slotID];
-    
 
     public void INIT(Button button, IUIToolkitInventoryUI inventoryManager, int slotID)
     {
@@ -49,6 +48,15 @@ public class UIToolkitInventorySlot
         button.Add(stackText);
 
         inventoryManager.TryRegisterSlotView(this, slotID);
+    }
+
+    public void DeInit()
+    {
+        button.UnregisterCallback<ClickEvent>(OnClick);
+        button.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        button.UnregisterCallback<PointerUpEvent>(OnPointerUp);
+        button.UnregisterCallback<PointerEnterEvent>(OnPointerEnter);
+        button.UnregisterCallback<PointerOutEvent>(OnPointerOut);
     }
 
     private void OnClick(ClickEvent click)
