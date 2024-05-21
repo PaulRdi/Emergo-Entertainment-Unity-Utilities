@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UIToolkitInventorySlot
 {
-    public static event Action<UIToolkitInventorySlot> OnDragStart;
+    public static event Action<UIToolkitInventorySlot, Vector3> OnDragStart;
     public static event Action<UIToolkitInventorySlot> OnDragEnd;
     public static event Action<Vector3> OnDrag;
 
@@ -87,7 +87,7 @@ public class UIToolkitInventorySlot
         if (_itemBatch == null || _itemBatch.item == null)
             return;
 
-        OnDragStart?.Invoke(this);
+        OnDragStart?.Invoke(this, evt.position);
         dragging = true;
     }
 

@@ -65,14 +65,8 @@ namespace EmergoEntertainment.Inventory
             UIToolkitInventorySlot.OnDrag -= Drag;
         }
 
-
-        private void Drag(Vector3 pointerPosition)
+        private void SetToPointerPosition(Vector3 pointerPosition) 
         {
-            if (!dragging)
-                return;
-
-            //pointerPosition.y = Screen.height - pointerPosition.y;
-
             Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, pointerPosition);
 
             float offset = autoDragOffset ? dragObjectSize / 2 : 0;
@@ -81,11 +75,21 @@ namespace EmergoEntertainment.Inventory
             dragObject.style.top = localMousePosition.y - offset;
         }
 
-        private void StartDrag(UIToolkitInventorySlot slot)
+        private void Drag(Vector3 pointerPosition)
+        {
+            if (!dragging)
+                return;
+
+            SetToPointerPosition(pointerPosition);
+        }
+
+        private void StartDrag(UIToolkitInventorySlot slot, Vector3 pointerPosition)
         {
             var batch = inventory.slotToItemBatch[slot.slotID];
             if (batch == null || batch.item == null)
                 return;
+
+            SetToPointerPosition(pointerPosition);
 
             var item = batch.item;
             dragging = true;
