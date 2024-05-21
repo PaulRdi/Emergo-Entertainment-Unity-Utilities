@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 public interface IUIToolkitInventoryVisuals
 {
-    public abstract Button CreateItemSlotVisuals(int index);
+    public abstract Button CreateItemSlotVisuals(int index, out UIToolkitInventorySlot slot);
     public abstract void CreateInventoryHolderVisuals();
     public abstract void INIT(IUIToolkitInventoryUI inventoryManager);
 }

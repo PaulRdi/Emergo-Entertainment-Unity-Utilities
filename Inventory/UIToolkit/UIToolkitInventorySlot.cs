@@ -22,6 +22,7 @@ public class UIToolkitInventorySlot
 
     private Label stackText;
     private Button button;
+    private VisualElement icon;
     private bool dragging = false;
 
     public int slotID;
@@ -29,18 +30,19 @@ public class UIToolkitInventorySlot
     public ItemBatch itemBatch => _itemBatch;
     private ItemBatch _itemBatch => inventoryManager.inventory.slotToItemBatch[slotID];
 
-    public void INIT(Button button, IUIToolkitInventoryUI inventoryManager, int slotID)
+    public void INIT(Button buttonElement, VisualElement iconElement, IUIToolkitInventoryUI inventoryManager, int slotID)
     {
-        this.button = button;
+        this.button = buttonElement;
         this.slotID = slotID;
+        this.icon = iconElement;
         this.inventoryManager = inventoryManager;
 
-        button.RegisterCallback<ClickEvent>(OnClick);
-        button.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
-        button.RegisterCallback<PointerUpEvent>(OnPointerUp);
-        button.RegisterCallback<PointerEnterEvent>(OnPointerEnter);
-        button.RegisterCallback<PointerOutEvent>(OnPointerOut);
-        button.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+        buttonElement.RegisterCallback<ClickEvent>(OnClick);
+        buttonElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        buttonElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
+        buttonElement.RegisterCallback<PointerEnterEvent>(OnPointerEnter);
+        buttonElement.RegisterCallback<PointerOutEvent>(OnPointerOut);
+        buttonElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
 
         stackText = new Label();
         stackText.name = "StackText";
@@ -48,7 +50,7 @@ public class UIToolkitInventorySlot
         stackText.text = "";
         stackText.pickingMode = PickingMode.Ignore;
         stackText.style.display = DisplayStyle.None;
-        button.Add(stackText);
+        buttonElement.Add(stackText);
     }
 
     public void DeInit()
@@ -70,12 +72,12 @@ public class UIToolkitInventorySlot
     {
         if (batch == null || batch.item == null)
         {
-            button.style.backgroundImage = null;
+            icon.style.backgroundImage = null;
             stackText.style.display = DisplayStyle.None;
         }
         else
         {
-            button.style.backgroundImage = new StyleBackground(batch.item.Icon);
+            icon.style.backgroundImage = new StyleBackground(batch.item.Icon);
             stackText.style.display = DisplayStyle.Flex;
             stackText.text = batch.count.ToString();
         }

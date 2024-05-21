@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace EmergoEntertainment.Inventory
 {
@@ -88,9 +87,7 @@ namespace EmergoEntertainment.Inventory
             visuals.CreateInventoryHolderVisuals();
             for (int i = 0; i < inventory.slotToItemBatch.Count; i++)
             {
-                var slotVisuals = visuals.CreateItemSlotVisuals(i);
-                var newInventorySlot = new UIToolkitInventorySlot();
-                newInventorySlot.INIT(slotVisuals, this, i);
+                var slotVisuals = visuals.CreateItemSlotVisuals(i, out UIToolkitInventorySlot newInventorySlot);
                 TryRegisterSlotView(newInventorySlot, i);
             }
             playerInventory.Updated += UpdateUI;

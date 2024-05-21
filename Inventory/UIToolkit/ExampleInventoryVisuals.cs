@@ -16,7 +16,7 @@ public class ExampleInventoryVisuals : MonoBehaviour, IUIToolkitInventoryVisuals
     private VisualElement root;
     private VisualElement inventoryHolder;
 
-    public Button CreateItemSlotVisuals(int index)
+    public Button CreateItemSlotVisuals(int index, out UIToolkitInventorySlot slot)
     {
         var button = new Button();
         button.AddToClassList("InventorySlot");
@@ -29,7 +29,16 @@ public class ExampleInventoryVisuals : MonoBehaviour, IUIToolkitInventoryVisuals
         button.style.marginTop = spacing;
         button.style.marginBottom = spacing;
 
+        var icon = new VisualElement();
+        icon.name = "Icon";
+        icon.style.width = cellSize * 0.8f;
+        icon.style.height = cellSize * 0.8f;
+        button.Add(icon);
+
         inventoryHolder.Add(button);
+        slot = new UIToolkitInventorySlot();
+        slot.INIT(button, icon, inventoryManager, index);
+
         return button;
     }
 
