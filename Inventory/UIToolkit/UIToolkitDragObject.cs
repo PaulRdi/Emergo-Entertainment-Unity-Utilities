@@ -71,7 +71,7 @@ namespace EmergoEntertainment.Inventory
             if (!dragging)
                 return;
 
-            pointerPosition.y = Screen.height - pointerPosition.y;
+            //pointerPosition.y = Screen.height - pointerPosition.y;
 
             Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, pointerPosition);
 
