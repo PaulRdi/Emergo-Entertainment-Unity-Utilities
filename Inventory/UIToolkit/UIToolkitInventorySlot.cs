@@ -40,7 +40,7 @@ public class UIToolkitInventorySlot
         button.RegisterCallback<PointerUpEvent>(OnPointerUp);
         button.RegisterCallback<PointerEnterEvent>(OnPointerEnter);
         button.RegisterCallback<PointerOutEvent>(OnPointerOut);
-        button.RegisterCallback<PointerMoveEvent>
+        button.RegisterCallback<PointerMoveEvent>(OnPointerMove);
 
         stackText = new Label();
         stackText.name = "StackText";
