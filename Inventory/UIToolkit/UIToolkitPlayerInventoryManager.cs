@@ -68,8 +68,8 @@ namespace EmergoEntertainment.Inventory
                     Debug.LogError("No visuals builder found on Inventory Manager");
                     return;
                 }
-                InitInventory(inventory);
                 visuals.INIT(this);
+                InitInventory(inventory);
                 DontDestroyOnLoad(this.gameObject);
             }
             else
