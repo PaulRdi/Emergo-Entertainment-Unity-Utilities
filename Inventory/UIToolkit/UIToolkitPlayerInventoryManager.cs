@@ -76,8 +76,6 @@ namespace EmergoEntertainment.Inventory
             {
                 Destroy(this.gameObject);
             }
-
-            visuals.INIT(this);
             UpdateUI();
         }
 
