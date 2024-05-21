@@ -49,8 +49,6 @@ public class UIToolkitInventorySlot
         stackText.pickingMode = PickingMode.Ignore;
         stackText.style.display = DisplayStyle.None;
         button.Add(stackText);
-
-        inventoryManager.TryRegisterSlotView(this, slotID);
     }
 
     public void DeInit()

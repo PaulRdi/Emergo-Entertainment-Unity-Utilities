@@ -5,12 +5,6 @@ using UnityEngine.UIElements;
 
 namespace EmergoEntertainment.Inventory
 {
-    /// <summary>
-    /// Uses pre-defined stylesheet names to create the visual elements for the inventory UI
-    /// "InventoryHolder" is the parent element for all inventory slots
-    /// "InventorySlot" is the element (button) for each individual slot
-    /// "SlotAmountText" is the element (label) for the stack size text
-    /// </summary>
     public class UIToolkitPlayerInventoryManager : MonoBehaviour, IUIToolkitInventoryUI
     {
         public static UIToolkitPlayerInventoryManager instance
@@ -32,13 +26,7 @@ namespace EmergoEntertainment.Inventory
 
         private Dictionary<int, UIToolkitInventorySlot> indexToInventorySlot;
 
-        [Header("Inventory Settings")]
-        [SerializeField] private float cellSize = 100;
-        [SerializeField] private float spacing = 10;
-        [SerializeField] private int slotsPerRow = 3;
-
-        private VisualElement root;
-        private VisualElement inventoryHolder;
+        private IUIToolkitInventoryVisuals visuals;
 
         public bool TryRegisterSlotView(UIToolkitInventorySlot slot, int id)
         {
@@ -79,6 +67,8 @@ namespace EmergoEntertainment.Inventory
                 Destroy(this.gameObject);
             }
 
+            visuals = GetComponent<IUIToolkitInventoryVisuals>();
+            visuals.INIT(this);
             UpdateUI();
         }
 
@@ -87,46 +77,16 @@ namespace EmergoEntertainment.Inventory
             _instance = this;
             playerInventory = inventory;
 
-            root = GetComponent<UIDocument>().rootVisualElement;
-
-            inventoryHolder = new VisualElement();
-            inventoryHolder.name = "Inventory";
-            inventoryHolder.AddToClassList("Inventory");
-            inventoryHolder.style.width = slotsPerRow * (cellSize + (2 * spacing));
-            inventoryHolder.style.height = Mathf.Ceil((float)inventory.numSlots / (float)slotsPerRow) * (cellSize + (2 * spacing));
-            inventoryHolder.pickingMode = PickingMode.Ignore;
-
-            root.Add(inventoryHolder);
-
-            int slotCount = inventory.slotToItemBatch.Count;
-            for (int i = 0; i < slotCount; i++)
+            //Architecture of the Visual elements is vaguely defined here 
+            visuals.CreateInventoryHolderVisuals();
+            for (int i = 0; i < inventory.slotToItemBatch.Count; i++)
             {
-                var slot = CreateNewEmptyItemSlot(i);
-                inventoryHolder.Add(slot);
+                var slotVisuals = visuals.CreateItemSlotVisuals(i);
+                var newInventorySlot = new UIToolkitInventorySlot();
+                newInventorySlot.INIT(slotVisuals, this, i);
+                TryRegisterSlotView(newInventorySlot, i);
             }
-
-            inventoryHolder.style.display = DisplayStyle.None;
             playerInventory.Updated += UpdateUI;
-        }
-
-        public Button CreateNewEmptyItemSlot(int index)
-        {
-            var button = new Button();
-            button.AddToClassList("InventorySlot");
-            button.name = "InventorySlot_" + index;
-
-            button.style.width = cellSize;
-            button.style.height = cellSize;
-            button.style.marginLeft = spacing;
-            button.style.marginRight = spacing;
-            button.style.marginTop = spacing;
-            button.style.marginBottom = spacing;
-
-
-            var slot = new UIToolkitInventorySlot();
-            slot.INIT(button, this, index);
-
-            return button;
         }
 
         private void UpdateUI () 
