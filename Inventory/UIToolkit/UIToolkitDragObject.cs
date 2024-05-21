@@ -73,10 +73,21 @@ namespace EmergoEntertainment.Inventory
             if (!dragging)
                 return;
 
-            Vector2 mousePosition = Input.mousePosition;
-            mousePosition.y = Screen.height - mousePosition.y;
+            Vector2 inputPosition;
 
-            Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, mousePosition);
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0); 
+                inputPosition = touch.position;
+            }
+            else
+            {
+                inputPosition = Input.mousePosition;
+            }
+
+            inputPosition.y = Screen.height - inputPosition.y;
+
+            Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, inputPosition);
 
             float offset = autoDragOffset ? dragObjectSize / 2 : 0;
 
