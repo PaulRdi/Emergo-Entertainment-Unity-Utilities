@@ -2,11 +2,13 @@ using EmergoEntertainment.Inventory;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 public class UIToolkitInventorySlot
 {
     public static event Action<UIToolkitInventorySlot> OnDragStart;
     public static event Action<UIToolkitInventorySlot> OnDragEnd;
+    public static event Action<Vector3> OnDrag;
 
     public static event Action<UIToolkitInventorySlot> Clicked;
     public event Action<UIToolkitInventorySlot> clicked;
@@ -38,6 +40,7 @@ public class UIToolkitInventorySlot
         button.RegisterCallback<PointerUpEvent>(OnPointerUp);
         button.RegisterCallback<PointerEnterEvent>(OnPointerEnter);
         button.RegisterCallback<PointerOutEvent>(OnPointerOut);
+        button.RegisterCallback<PointerMoveEvent>
 
         stackText = new Label();
         stackText.name = "StackText";
@@ -90,12 +93,20 @@ public class UIToolkitInventorySlot
         dragging = true;
     }
 
-    private void OnPointerUp(PointerUpEvent eventData)
+    private void OnPointerUp(PointerUpEvent evt)
     {
         if (_itemBatch == null || _itemBatch.item == null || !dragging)
             return;
 
         OnDragEnd?.Invoke(this);
+    }
+
+    private void OnPointerMove(PointerMoveEvent evt)
+    {
+        if (_itemBatch == null || _itemBatch.item == null || !dragging)
+            return;
+
+        OnDrag?.Invoke(evt.position);
     }
 
     //Assuming slots don't overlap

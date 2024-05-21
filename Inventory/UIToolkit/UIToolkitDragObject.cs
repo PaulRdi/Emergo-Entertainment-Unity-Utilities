@@ -55,39 +55,25 @@ namespace EmergoEntertainment.Inventory
         {
             UIToolkitInventorySlot.OnDragStart += StartDrag;
             UIToolkitInventorySlot.OnDragEnd += StopDrag;
+            UIToolkitInventorySlot.OnDrag += Drag;
         }
 
         private void OnDisable()
         {
             UIToolkitInventorySlot.OnDragStart -= StartDrag;
             UIToolkitInventorySlot.OnDragEnd -= StopDrag;
+            UIToolkitInventorySlot.OnDrag -= Drag;
         }
 
-        private void Update()
-        {
-            SetDragObjectToMousePosition();
-        }
 
-        private void SetDragObjectToMousePosition()
+        private void Drag(Vector3 pointerPosition)
         {
             if (!dragging)
                 return;
 
-            Vector2 inputPosition;
+            pointerPosition.y = Screen.height - pointerPosition.y;
 
-            if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0); 
-                inputPosition = touch.position;
-            }
-            else
-            {
-                inputPosition = Input.mousePosition;
-            }
-
-            inputPosition.y = Screen.height - inputPosition.y;
-
-            Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, inputPosition);
+            Vector2 localMousePosition = root.ChangeCoordinatesTo(root.parent, pointerPosition);
 
             float offset = autoDragOffset ? dragObjectSize / 2 : 0;
 
