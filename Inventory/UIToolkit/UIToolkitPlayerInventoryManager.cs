@@ -7,6 +7,7 @@ namespace EmergoEntertainment.Inventory
 {
     public class UIToolkitPlayerInventoryManager : MonoBehaviour, IUIToolkitInventoryUI
     {
+
         public static UIToolkitPlayerInventoryManager instance
         {
             get
@@ -22,7 +23,10 @@ namespace EmergoEntertainment.Inventory
 
         public Inventory inventory => playerInventory;
         public Inventory playerInventory;
+        [Header("Settings")]
         [SerializeField] bool initOnAwake = false;
+        [SerializeField] private int defaultBatchSize;
+        [SerializeField] private int defaultSlotCount;
 
         private Dictionary<int, UIToolkitInventorySlot> indexToInventorySlot;
 
@@ -55,11 +59,17 @@ namespace EmergoEntertainment.Inventory
             {
                 if (inventory == default)
                 {
-                    inventory = new Inventory(3, 8);
+                    inventory = new Inventory(defaultBatchSize, defaultSlotCount);
                     Debug.LogWarning("Did not provide an inventory on init. Initializing new inventory.");
                 }
-
+                visuals = GetComponent<IUIToolkitInventoryVisuals>();
+                if (visuals == null)
+                {
+                    Debug.LogError("No visuals builder found on Inventory Manager");
+                    return;
+                }
                 InitInventory(inventory);
+                visuals.INIT(this);
                 DontDestroyOnLoad(this.gameObject);
             }
             else
@@ -67,7 +77,6 @@ namespace EmergoEntertainment.Inventory
                 Destroy(this.gameObject);
             }
 
-            visuals = GetComponent<IUIToolkitInventoryVisuals>();
             visuals.INIT(this);
             UpdateUI();
         }
